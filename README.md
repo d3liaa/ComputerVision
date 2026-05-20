@@ -1,2 +1,26 @@
-# ComputerVision
-Simulation of a Geometric 3D Scanner
+# Project Checklist — Geometric 3D Scanner
+
+- [x] Created Blender scene
+- [x] Created rotating disk/platform
+- [x] Added 3D object on the disk
+- [x] Replaced smooth moon model with asteroid/rock model with real geometry
+- [x] Added camera
+- [x] Fixed camera framing
+- [x] Created synthetic red laser stripe
+- [x] Removed unwanted extra laser object
+- [x] Rendered rotating image sequence
+- [x] Saved rendered images in `scanner_renders/`
+- [ ] Export camera calibration from Blender
+- [ ] Save calibration data to JSON
+- [ ] Extract red laser stripe from each rendered image
+- [ ] Save stripe masks in `stripe_masks/`
+- [ ] Extract laser pixel coordinates
+- [ ] Back-project laser pixels into 3D camera rays
+- [ ] Intersect camera rays with the laser plane
+- [ ] Undo disk rotation for each frame
+- [ ] Merge all reconstructed points into one point cloud
+- [ ] Save point cloud
+- [ ] Reconstruct mesh from point cloud
+- [ ] Export original Blender object as ground-truth mesh
+- [ ] Compute Chamfer Distance
+- [ ] Write final report/evaluation
