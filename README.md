@@ -10,17 +10,21 @@
 - [x] Removed unwanted extra laser object
 - [x] Rendered rotating image sequence
 - [x] Saved rendered images in `scanner_renders/`
-- [ ] Export camera calibration from Blender
-- [ ] Save calibration data to JSON
-- [ ] Extract red laser stripe from each rendered image
-- [ ] Save stripe masks in `stripe_masks/`
-- [ ] Extract laser pixel coordinates
-- [ ] Back-project laser pixels into 3D camera rays
-- [ ] Intersect camera rays with the laser plane
-- [ ] Undo disk rotation for each frame
-- [ ] Merge all reconstructed points into one point cloud
-- [ ] Save point cloud
+- [x] Export camera calibration from Blender
+- [x] Save calibration data to JSON
+- [x] Extract red laser stripe from each rendered image
+- [x] Save stripe masks in `stripe_masks/`
+- [x] Extract laser pixel coordinates
+- [x] Back-project laser pixels into 3D camera rays
+- [x] Intersect camera rays with the laser plane
+- [x] Undo disk rotation for each frame
+- [x] Merge all reconstructed points into one point cloud
+- [x] Save point cloud
 - [ ] Reconstruct mesh from point cloud
 - [ ] Export original Blender object as ground-truth mesh
 - [ ] Compute Chamfer Distance
 - [ ] Write final report/evaluation
+
+
+Future work:
+- [] Instead of extracting camera params directly from blender, make a camera calibration step via a checkerboard rendering

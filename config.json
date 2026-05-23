@@ -1,0 +1,71 @@
+{
+  "active": "asteroid",
+
+  "asteroid": {
+    "camera": {
+      "focal_length_mm": 35,
+      "sensor_width_mm": 32,
+      "image_width": 1024,
+      "image_height": 1024,
+      "location": [0, -7, 4],
+      "rotation_euler_deg": [65, 0, 0]
+    },
+    "laser": {
+      "point": [0.35, 0, 0],
+      "normal": [1, 0, 0]
+    },
+    "stripe": {
+      "min_red": 120,
+      "min_red_excess": 20
+    },
+    "disk": {
+      "center": [0, 0, 0],
+      "axis": [0, 0, 1],
+      "n_frames": 36,
+      "angle_per_frame_deg": 10.0
+    },
+    "paths": {
+      "input_dir": "scanner_renders_asteroid",
+      "stripe_masks_dir": "stripe_masks_asteroid",
+      "stripe_coords_dir": "stripe_coords_asteroid",
+      "point_cloud": "point_cloud_asteroid.ply",
+      "reconstructed_mesh": "mesh_asteroid.ply",
+      "ground_truth_mesh": "blender/asteroid_ground_truth.stl",
+      "metrics": "metrics_asteroid.json"
+    }
+  },
+
+  "moon": {
+    "camera": {
+      "focal_length_mm": 35,
+      "sensor_width_mm": 32,
+      "image_width": 1024,
+      "image_height": 1024,
+      "location": [0, -7, 4],
+      "rotation_euler_deg": [65, 0, 0]
+    },
+    "laser": {
+      "point": [0.35, 0, 0],
+      "normal": [1, 0, 0]
+    },
+    "stripe": {
+      "min_red": 120,
+      "min_red_excess": 20
+    },
+    "disk": {
+      "center": [0, 0, 0],
+      "axis": [0, 0, 1],
+      "n_frames": 36,
+      "angle_per_frame_deg": 10.0
+    },
+    "paths": {
+      "input_dir": "scanner_renders_moon",
+      "stripe_masks_dir": "stripe_masks_moon",
+      "stripe_coords_dir": "stripe_coords_moon",
+      "point_cloud": "point_cloud_moon.ply",
+      "reconstructed_mesh": "mesh_moon.ply",
+      "ground_truth_mesh": "blender/moondisplace7.stl",
+      "metrics": "metrics_moon.json"
+    }
+  }
+}
