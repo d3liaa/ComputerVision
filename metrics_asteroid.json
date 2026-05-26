@@ -1,0 +1,11 @@
+{
+  "reconstruction_to_ground_truth_mean": 0.09188017397602491,
+  "ground_truth_to_reconstruction_mean": 0.09334662622933237,
+  "chamfer_l1_mean": 0.09261340010267864,
+  "chamfer_l2_mean": 0.01462279418483988,
+  "reconstruction_to_ground_truth_p95": 0.22041386341632174,
+  "ground_truth_to_reconstruction_p95": 0.2710857837510919,
+  "dataset": "asteroid",
+  "sample_count": 30000,
+  "ground_truth_aligned_by_bbox": true
+}
