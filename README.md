@@ -20,9 +20,9 @@
 - [x] Undo disk rotation for each frame
 - [x] Merge all reconstructed points into one point cloud
 - [x] Save point cloud
-- [ ] Reconstruct mesh from point cloud
-- [ ] Export original Blender object as ground-truth mesh
-- [ ] Compute Chamfer Distance
+- [x] Reconstruct mesh from point cloud
+- [x] Export original Blender object as ground-truth mesh
+- [x] Compute Chamfer Distance
 - [ ] Write final report/evaluation
 
 
