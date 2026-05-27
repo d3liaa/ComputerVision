@@ -2,3 +2,4 @@
 .venv*/
 __pycache__
 .venv312
+.DS_Store
