@@ -6,11 +6,12 @@ import open3d as o3d
 
 
 def build_camera_matrix(cam):
-    fx = cam["focal_length_mm"] * cam["image_width"] / cam["sensor_width_mm"]
-    cx = cam["image_width"]  / 2.0
-    cy = cam["image_height"] / 2.0
+    fx = cam.get("fx_px", cam["focal_length_mm"] * cam["image_width"] / cam["sensor_width_mm"])
+    fy = cam.get("fy_px", fx)
+    cx = cam.get("cx_px", cam["image_width"] / 2.0)
+    cy = cam.get("cy_px", cam["image_height"] / 2.0)
     return np.array([[fx, 0, cx],
-                     [0, fx, cy],
+                     [0, fy, cy],
                      [0,  0,  1]], dtype=np.float64)
 
 
@@ -21,6 +22,13 @@ def rotation_x(deg):
                      [0, np.sin(a),  np.cos(a)]], dtype=np.float64)
 
 
+def rotation_y(deg):
+    a = np.radians(deg)
+    return np.array([[np.cos(a), 0, np.sin(a)],
+                     [0,         1, 0],
+                     [-np.sin(a), 0, np.cos(a)]], dtype=np.float64)
+
+
 def rotation_z(deg):
     a = np.radians(deg)
     return np.array([[np.cos(a), -np.sin(a), 0],
@@ -28,16 +36,48 @@ def rotation_z(deg):
                      [0,          0,         1]], dtype=np.float64)
 
 
+def rotation_axis_angle(axis, deg):
+    axis = np.array(axis, dtype=np.float64)
+    axis /= np.linalg.norm(axis)
+    a = np.radians(deg)
+    x, y, z = axis
+    c = np.cos(a)
+    s = np.sin(a)
+    C = 1.0 - c
+    return np.array(
+        [
+            [x * x * C + c, x * y * C - z * s, x * z * C + y * s],
+            [y * x * C + z * s, y * y * C + c, y * z * C - x * s],
+            [z * x * C - y * s, z * y * C + x * s, z * z * C + c],
+        ],
+        dtype=np.float64,
+    )
+
+
+def disk_frame(axis, reference=(1.0, 0.0, 0.0)):
+    z_axis = np.array(axis, dtype=np.float64)
+    z_axis /= np.linalg.norm(z_axis)
+    x_axis = np.array(reference, dtype=np.float64)
+    x_axis -= z_axis * float(x_axis @ z_axis)
+    if np.linalg.norm(x_axis) < 1e-8:
+        x_axis = np.array([0.0, 1.0, 0.0], dtype=np.float64)
+        x_axis -= z_axis * float(x_axis @ z_axis)
+    x_axis /= np.linalg.norm(x_axis)
+    y_axis = np.cross(z_axis, x_axis)
+    y_axis /= np.linalg.norm(y_axis)
+    return np.column_stack((x_axis, y_axis, z_axis))
+
+
 def build_extrinsics(cam):
-    """
-    Converts Blender camera pose to OpenCV-convention world-to-camera transform.
-    Blender camera: X right, Y up, Z out of screen (looks in -Z).
-    OpenCV camera:  X right, Y down, Z into screen.
-    """
+    if "world_to_camera_rotation" in cam and "world_to_camera_translation" in cam:
+        return (
+            np.array(cam["world_to_camera_rotation"], dtype=np.float64),
+            np.array(cam["world_to_camera_translation"], dtype=np.float64),
+        )
+
     rx, ry, rz = cam["rotation_euler_deg"]
 
-    # Blender XYZ Euler: R = Rx * Ry * Rz
-    R_blender = rotation_x(rx)  # ry and rz are 0
+    R_blender = rotation_x(rx) @ rotation_y(ry) @ rotation_z(rz)
 
     # Flip Y and Z to go from Blender camera space to OpenCV camera space
     M = np.diag([1.0, -1.0, -1.0])
@@ -48,9 +88,9 @@ def build_extrinsics(cam):
     return R_world_to_cam, t_world_to_cam
 
 
-def ray_plane_intersect(origin, direction, plane_normal, plane_point):
+def ray_plane_intersect(origin, direction, plane_normal, plane_point, min_abs_denom=1e-8):
     denom = plane_normal @ direction
-    if abs(denom) < 1e-8:
+    if abs(denom) < min_abs_denom:
         return None
     t = (plane_normal @ (plane_point - origin)) / denom
     if t < 0:
@@ -62,7 +102,6 @@ def reconstruct(config):
     cam   = config["camera"]
     laser = config["laser"]
     disk  = config["disk"]
-
     K              = build_camera_matrix(cam)
     R_cam, t_cam   = build_extrinsics(cam)
     cam_origin     = -R_cam.T @ t_cam # camera position in world space
@@ -70,8 +109,18 @@ def reconstruct(config):
     plane_normal = np.array(laser["normal"], dtype=np.float64)
     plane_point  = np.array(laser["point"],  dtype=np.float64)
     disk_center  = np.array(disk["center"],  dtype=np.float64)
+    disk_axis = np.array(disk.get("axis", [0.0, 0.0, 1.0]), dtype=np.float64)
+    disk_axis = disk_axis / np.linalg.norm(disk_axis)
+    disk_basis = disk_frame(disk_axis, disk.get("reference_x", [1.0, 0.0, 0.0]))
+    rotation_direction = float(disk.get("rotation_direction", -1.0))
+    recon_cfg = config.get("reconstruction", {})
+    min_abs_denom = float(recon_cfg.get("min_abs_plane_denom", 1e-8))
+    max_radius = recon_cfg.get("max_radius")
+    min_z = recon_cfg.get("min_z")
+    max_z = recon_cfg.get("max_z")
+    radius_z_gate = recon_cfg.get("radius_z_gate")
 
-    coord_files = sorted(glob.glob(os.path.join(config["paths"]["stripe_coords_dir"], "scan_*.npy")))
+    coord_files = sorted(glob.glob(os.path.join(config["paths"]["stripe_coords_dir"], "*.npy")))
 
     all_points = []
 
@@ -80,8 +129,8 @@ def reconstruct(config):
         if len(coords) == 0:
             continue
 
-        angle        = i * disk["angle_per_frame_deg"]
-        R_disk_inv   = rotation_z(-angle)
+        angle = rotation_direction * i * disk["angle_per_frame_deg"]
+        R_disk_inv = rotation_axis_angle(disk_axis, angle)
 
         for v, u in coords:
             # Pixel to normalized ray in OpenCV camera space
@@ -93,12 +142,27 @@ def reconstruct(config):
             ray_world = R_cam.T @ ray_cam
             ray_world /= np.linalg.norm(ray_world)
 
-            point = ray_plane_intersect(cam_origin, ray_world, plane_normal, plane_point)
+            point = ray_plane_intersect(cam_origin, ray_world, plane_normal, plane_point, min_abs_denom)
             if point is None:
                 continue
 
             # Undo disk rotation to bring point into object-local space
-            point_local = R_disk_inv @ (point - disk_center)
+            point_local_world = R_disk_inv @ (point - disk_center)
+            point_local = disk_basis.T @ point_local_world
+            if max_radius is not None and np.linalg.norm(point_local[:2]) > float(max_radius):
+                continue
+            if min_z is not None and point_local[2] < float(min_z):
+                continue
+            if max_z is not None and point_local[2] > float(max_z):
+                continue
+            if radius_z_gate is not None:
+                radial_distance = float(np.linalg.norm(point_local[:2]))
+                z_value = float(point_local[2])
+                min_gate_z = float(radius_z_gate.get("min_z", -np.inf))
+                max_gate_z = float(radius_z_gate.get("max_z", np.inf))
+                max_gate_radius = float(radius_z_gate.get("max_radius", np.inf))
+                if min_gate_z <= z_value <= max_gate_z and radial_distance > max_gate_radius:
+                    continue
             all_points.append(point_local)
 
     return np.array(all_points, dtype=np.float32)

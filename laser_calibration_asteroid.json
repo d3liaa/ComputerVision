@@ -1,0 +1,51 @@
+{
+  "dataset": "asteroid",
+  "camera_plane": {
+    "normal": [
+      0.9948220265866914,
+      -0.09936283253782892,
+      -0.021357971064868635
+    ],
+    "point": [
+      0.025842843574175246,
+      -0.40172003234603454,
+      6.087917188125244
+    ]
+  },
+  "world_plane": {
+    "normal": [
+      0.9948220265866914,
+      0.022635652077375574,
+      0.0990795774767959
+    ],
+    "point": [
+      0.025842843574175246,
+      -1.3126990237913259,
+      1.7912170138570078
+    ]
+  },
+  "total_points": 1176,
+  "kept_points": 981,
+  "images": [
+    {
+      "image": "scanner_asteroid_new_checkerboards\\checkerboard_1.png",
+      "used_points": 325,
+      "charuco_corners": 63
+    },
+    {
+      "image": "scanner_asteroid_new_checkerboards\\checkerboard_2.png",
+      "used_points": 199,
+      "charuco_corners": 66
+    },
+    {
+      "image": "scanner_asteroid_new_checkerboards\\checkerboard_3.png",
+      "used_points": 290,
+      "charuco_corners": 58
+    },
+    {
+      "image": "scanner_asteroid_new_checkerboards\\checkerboard_4.png",
+      "used_points": 362,
+      "charuco_corners": 66
+    }
+  ]
+}
