@@ -31,63 +31,63 @@
   ],
   "frames_total": 360,
   "frames_sampled": 360,
-  "poses_used": 188,
+  "poses_used": 189,
   "poses_used_for_axis": 171,
-  "frames_used": 188,
-  "rms_reprojection": 1.6280732154846191,
-  "mean_reprojection": 1.3396629095077515,
-  "p95_reprojection": 3.2557578086853027,
-  "disk_radius_camera": 1.3139287485863929,
-  "disk_circle_residual_mean": 0.20383367486635634,
-  "disk_circle_residual_p95": 0.46181629797036755,
+  "frames_used": 189,
+  "rms_reprojection": 1.6283818483352661,
+  "mean_reprojection": 1.3403818607330322,
+  "p95_reprojection": 3.256816864013672,
+  "disk_radius_camera": 1.3137246193958856,
+  "disk_circle_residual_mean": 0.20375389414401465,
+  "disk_circle_residual_p95": 0.46189158855895435,
   "disk_center_camera": [
-    -0.14718170007852316,
-    0.6016102434784415,
-    9.239805323163507
+    -0.14681283364840747,
+    0.6017178218790309,
+    9.240067415465063
   ],
   "disk_axis_camera": [
-    0.23762689029595954,
-    -0.9326353838203304,
-    -0.2715229306238741
+    0.2375361876001912,
+    -0.932626802041486,
+    -0.2716317501586251
   ],
   "disk_center_world": [
-    -0.14718170007852316,
-    1.1198560397415194,
-    -0.4501545129233502
+    -0.14681283364840747,
+    1.1200481114386838,
+    -0.4503627770584205
   ],
   "disk_axis_world": [
-    0.23762689029595954,
-    0.1480653983645889,
-    0.9600052597852825
+    0.23753618760019124,
+    0.14796314755640452,
+    0.9600434711749091
   ],
   "estimated_extrinsics": {
     "frame": "turntable_from_fitted_board_trajectory",
     "world_to_camera_rotation": [
       [
-        0.839912721519515,
-        0.48793450507004904,
-        0.23762689029595954
+        0.8398039324434896,
+        0.48816586795147554,
+        0.2375361876001912
       ],
       [
-        0.33769468070464825,
-        -0.12709659110334484,
-        -0.9326353838203304
+        0.3376994766291597,
+        -0.1271468111997409,
+        -0.932626802041486
       ],
       [
-        -0.4248634167040832,
-        0.8635776602552635,
-        -0.2715229306238741
+        -0.42507460349548315,
+        0.8634395020897063,
+        -0.2716317501586251
       ]
     ],
     "world_to_camera_translation": [
-      -0.14718170007852316,
-      0.6016102434784415,
-      9.239805323163507
+      -0.14681283364840747,
+      0.6017178218790309,
+      9.240067415465063
     ],
     "camera_location_world": [
-      3.8461144624705463,
-      -7.8310118210895245,
-      3.104876349774319
+      3.8478121944044634,
+      -7.830063691826111,
+      3.1059472123924916
     ]
   },
   "config_extrinsics": {
@@ -121,944 +121,949 @@
   },
   "images": [
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0001.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0001.png",
       "charuco_corners": 42,
-      "mean_reprojection": 1.4694229364395142
+      "mean_reprojection": 1.4694219827651978
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0002.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0002.png",
       "charuco_corners": 39,
-      "mean_reprojection": 0.8735612630844116
+      "mean_reprojection": 0.8735589981079102
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0003.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0003.png",
       "charuco_corners": 47,
-      "mean_reprojection": 1.6808463335037231
+      "mean_reprojection": 1.6808488368988037
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0004.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0004.png",
       "charuco_corners": 53,
-      "mean_reprojection": 1.6316461563110352
+      "mean_reprojection": 1.6316460371017456
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0005.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0005.png",
       "charuco_corners": 39,
-      "mean_reprojection": 1.5198026895523071
+      "mean_reprojection": 1.5198014974594116
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0007.png",
-      "charuco_corners": 37,
-      "mean_reprojection": 1.5485371351242065
-    },
-    {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0009.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0007.png",
       "charuco_corners": 41,
-      "mean_reprojection": 1.224431037902832
+      "mean_reprojection": 1.5521687269210815
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0013.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0009.png",
       "charuco_corners": 41,
-      "mean_reprojection": 1.1181544065475464
+      "mean_reprojection": 1.2244324684143066
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0014.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0013.png",
+      "charuco_corners": 41,
+      "mean_reprojection": 1.1181538105010986
+    },
+    {
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0014.png",
       "charuco_corners": 40,
-      "mean_reprojection": 1.2652387619018555
+      "mean_reprojection": 1.2652379274368286
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0015.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0015.png",
       "charuco_corners": 35,
       "mean_reprojection": 1.3485922813415527
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0017.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0017.png",
       "charuco_corners": 43,
-      "mean_reprojection": 1.3624825477600098
+      "mean_reprojection": 1.3624845743179321
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0021.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0021.png",
       "charuco_corners": 38,
-      "mean_reprojection": 1.2655643224716187
+      "mean_reprojection": 1.2655653953552246
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0025.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0025.png",
       "charuco_corners": 37,
-      "mean_reprojection": 1.8623292446136475
+      "mean_reprojection": 1.8623279333114624
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0033.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0033.png",
       "charuco_corners": 41,
       "mean_reprojection": 1.520919680595398
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0063.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0063.png",
       "charuco_corners": 40,
-      "mean_reprojection": 1.4506027698516846
+      "mean_reprojection": 1.4506034851074219
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0064.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0064.png",
       "charuco_corners": 50,
-      "mean_reprojection": 1.282118797302246
+      "mean_reprojection": 1.2821193933486938
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0069.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0069.png",
       "charuco_corners": 40,
-      "mean_reprojection": 1.3995792865753174
+      "mean_reprojection": 1.399580717086792
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0070.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0070.png",
       "charuco_corners": 35,
       "mean_reprojection": 1.2682982683181763
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0073.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0073.png",
       "charuco_corners": 39,
-      "mean_reprojection": 1.721229910850525
+      "mean_reprojection": 1.7212340831756592
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0074.png",
-      "charuco_corners": 46,
-      "mean_reprojection": 1.3563363552093506
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0074.png",
+      "charuco_corners": 47,
+      "mean_reprojection": 1.3824304342269897
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0077.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0075.png",
       "charuco_corners": 37,
-      "mean_reprojection": 1.575345516204834
+      "mean_reprojection": 1.3866935968399048
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0078.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0077.png",
+      "charuco_corners": 37,
+      "mean_reprojection": 1.575346827507019
+    },
+    {
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0078.png",
       "charuco_corners": 37,
       "mean_reprojection": 1.645127773284912
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0079.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0079.png",
       "charuco_corners": 38,
-      "mean_reprojection": 1.1123578548431396
+      "mean_reprojection": 1.1123621463775635
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0080.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0080.png",
       "charuco_corners": 38,
-      "mean_reprojection": 1.5428928136825562
+      "mean_reprojection": 1.542893409729004
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0081.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0081.png",
       "charuco_corners": 37,
       "mean_reprojection": 1.7627840042114258
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0082.png",
-      "charuco_corners": 49,
-      "mean_reprojection": 1.6714004278182983
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0082.png",
+      "charuco_corners": 45,
+      "mean_reprojection": 1.7582249641418457
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0083.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0083.png",
       "charuco_corners": 37,
       "mean_reprojection": 1.5973303318023682
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0084.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0084.png",
       "charuco_corners": 54,
-      "mean_reprojection": 1.5943677425384521
+      "mean_reprojection": 1.5943684577941895
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0085.png",
-      "charuco_corners": 39,
-      "mean_reprojection": 1.6398953199386597
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0085.png",
+      "charuco_corners": 38,
+      "mean_reprojection": 1.6251624822616577
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0086.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0086.png",
       "charuco_corners": 46,
-      "mean_reprojection": 1.3317687511444092
+      "mean_reprojection": 1.3308261632919312
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0087.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0087.png",
       "charuco_corners": 55,
-      "mean_reprojection": 1.5504086017608643
+      "mean_reprojection": 1.5504090785980225
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0088.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0088.png",
       "charuco_corners": 49,
-      "mean_reprojection": 1.3206253051757812
+      "mean_reprojection": 1.320631742477417
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0089.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0089.png",
       "charuco_corners": 40,
-      "mean_reprojection": 1.3588659763336182
+      "mean_reprojection": 1.3588653802871704
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0090.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0090.png",
       "charuco_corners": 37,
-      "mean_reprojection": 1.6103852987289429
+      "mean_reprojection": 1.6103832721710205
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0092.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0092.png",
       "charuco_corners": 42,
       "mean_reprojection": 1.744113564491272
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0093.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0093.png",
       "charuco_corners": 45,
-      "mean_reprojection": 1.570425271987915
+      "mean_reprojection": 1.570428490638733
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0094.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0094.png",
       "charuco_corners": 51,
-      "mean_reprojection": 1.4819588661193848
+      "mean_reprojection": 1.4819525480270386
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0095.png",
-      "charuco_corners": 44,
-      "mean_reprojection": 1.5397971868515015
-    },
-    {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0096.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0095.png",
       "charuco_corners": 46,
-      "mean_reprojection": 1.56913423538208
+      "mean_reprojection": 1.534868836402893
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0097.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0096.png",
+      "charuco_corners": 46,
+      "mean_reprojection": 1.5691287517547607
+    },
+    {
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0097.png",
       "charuco_corners": 53,
       "mean_reprojection": 1.6359466314315796
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0098.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0098.png",
       "charuco_corners": 63,
-      "mean_reprojection": 1.5990992784500122
+      "mean_reprojection": 1.5990962982177734
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0099.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0099.png",
       "charuco_corners": 53,
-      "mean_reprojection": 1.4728645086288452
+      "mean_reprojection": 1.4728648662567139
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0100.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0100.png",
       "charuco_corners": 53,
-      "mean_reprojection": 1.411726713180542
+      "mean_reprojection": 1.4117263555526733
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0101.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0101.png",
       "charuco_corners": 54,
-      "mean_reprojection": 1.4073365926742554
+      "mean_reprojection": 1.4073357582092285
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0102.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0102.png",
       "charuco_corners": 42,
       "mean_reprojection": 1.1987760066986084
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0103.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0103.png",
       "charuco_corners": 49,
-      "mean_reprojection": 1.3179916143417358
+      "mean_reprojection": 1.3179895877838135
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0104.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0104.png",
       "charuco_corners": 47,
       "mean_reprojection": 1.4991081953048706
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0105.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0105.png",
       "charuco_corners": 41,
       "mean_reprojection": 1.5774502754211426
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0106.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0106.png",
       "charuco_corners": 50,
-      "mean_reprojection": 1.3530256748199463
+      "mean_reprojection": 1.3530272245407104
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0107.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0107.png",
       "charuco_corners": 52,
-      "mean_reprojection": 1.353718876838684
+      "mean_reprojection": 1.3537243604660034
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0108.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0108.png",
       "charuco_corners": 53,
       "mean_reprojection": 1.3188230991363525
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0109.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0109.png",
       "charuco_corners": 45,
       "mean_reprojection": 1.1111903190612793
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0110.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0110.png",
       "charuco_corners": 46,
-      "mean_reprojection": 1.1755378246307373
+      "mean_reprojection": 1.1755363941192627
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0111.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0111.png",
       "charuco_corners": 37,
-      "mean_reprojection": 1.2292202711105347
+      "mean_reprojection": 1.2292201519012451
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0112.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0112.png",
       "charuco_corners": 44,
       "mean_reprojection": 1.3689284324645996
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0113.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0113.png",
       "charuco_corners": 39,
       "mean_reprojection": 1.0965173244476318
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0114.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0114.png",
       "charuco_corners": 40,
-      "mean_reprojection": 0.8203467130661011
+      "mean_reprojection": 0.8203443288803101
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0115.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0115.png",
       "charuco_corners": 43,
-      "mean_reprojection": 1.333976149559021
+      "mean_reprojection": 1.3339769840240479
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0118.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0118.png",
       "charuco_corners": 43,
-      "mean_reprojection": 1.2510321140289307
+      "mean_reprojection": 1.251031517982483
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0119.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0119.png",
       "charuco_corners": 53,
-      "mean_reprojection": 1.1231449842453003
+      "mean_reprojection": 1.1231462955474854
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0120.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0120.png",
       "charuco_corners": 43,
-      "mean_reprojection": 1.0710911750793457
+      "mean_reprojection": 1.071092963218689
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0121.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0121.png",
       "charuco_corners": 44,
-      "mean_reprojection": 1.012442708015442
+      "mean_reprojection": 1.0124415159225464
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0122.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0122.png",
       "charuco_corners": 35,
-      "mean_reprojection": 1.3144917488098145
+      "mean_reprojection": 1.3144906759262085
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0123.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0123.png",
       "charuco_corners": 41,
       "mean_reprojection": 1.1460767984390259
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0124.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0124.png",
       "charuco_corners": 48,
-      "mean_reprojection": 1.1314009428024292
+      "mean_reprojection": 1.1314001083374023
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0125.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0125.png",
       "charuco_corners": 47,
-      "mean_reprojection": 1.1933176517486572
+      "mean_reprojection": 1.1933139562606812
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0126.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0126.png",
       "charuco_corners": 43,
       "mean_reprojection": 1.0388844013214111
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0127.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0127.png",
       "charuco_corners": 45,
       "mean_reprojection": 1.0701403617858887
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0128.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0128.png",
       "charuco_corners": 49,
       "mean_reprojection": 1.2126295566558838
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0129.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0129.png",
       "charuco_corners": 54,
       "mean_reprojection": 1.0891547203063965
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0130.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0130.png",
       "charuco_corners": 39,
-      "mean_reprojection": 0.966006338596344
+      "mean_reprojection": 0.960914134979248
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0131.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0131.png",
       "charuco_corners": 42,
-      "mean_reprojection": 1.1292667388916016
+      "mean_reprojection": 1.1152279376983643
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0132.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0132.png",
       "charuco_corners": 51,
-      "mean_reprojection": 1.1925668716430664
+      "mean_reprojection": 1.1925644874572754
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0133.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0133.png",
       "charuco_corners": 47,
-      "mean_reprojection": 1.2494357824325562
+      "mean_reprojection": 1.2494882345199585
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0134.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0134.png",
       "charuco_corners": 37,
-      "mean_reprojection": 1.174110770225525
+      "mean_reprojection": 1.174116611480713
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0135.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0135.png",
       "charuco_corners": 42,
-      "mean_reprojection": 1.1440109014511108
+      "mean_reprojection": 1.1440117359161377
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0137.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0137.png",
       "charuco_corners": 43,
       "mean_reprojection": 1.267038345336914
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0139.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0139.png",
       "charuco_corners": 36,
-      "mean_reprojection": 1.2706490755081177
+      "mean_reprojection": 1.2706503868103027
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0141.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0141.png",
       "charuco_corners": 35,
-      "mean_reprojection": 1.0606820583343506
+      "mean_reprojection": 1.0606811046600342
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0142.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0142.png",
       "charuco_corners": 47,
-      "mean_reprojection": 1.1935173273086548
+      "mean_reprojection": 1.1935150623321533
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0143.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0143.png",
       "charuco_corners": 42,
-      "mean_reprojection": 1.0500788688659668
+      "mean_reprojection": 1.0500766038894653
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0144.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0144.png",
       "charuco_corners": 44,
-      "mean_reprojection": 1.268715739250183
+      "mean_reprojection": 1.268717646598816
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0145.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0145.png",
       "charuco_corners": 48,
       "mean_reprojection": 0.9593649506568909
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0146.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0146.png",
       "charuco_corners": 38,
       "mean_reprojection": 1.375939965248108
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0147.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0147.png",
       "charuco_corners": 45,
-      "mean_reprojection": 1.1952499151229858
+      "mean_reprojection": 1.1952508687973022
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0148.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0148.png",
       "charuco_corners": 41,
-      "mean_reprojection": 1.0856956243515015
+      "mean_reprojection": 1.0856953859329224
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0149.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0149.png",
       "charuco_corners": 45,
       "mean_reprojection": 1.1700748205184937
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0150.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0150.png",
       "charuco_corners": 39,
-      "mean_reprojection": 1.2452205419540405
+      "mean_reprojection": 1.2452207803726196
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0151.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0151.png",
       "charuco_corners": 38,
-      "mean_reprojection": 1.3033970594406128
+      "mean_reprojection": 1.3033990859985352
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0152.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0152.png",
       "charuco_corners": 47,
       "mean_reprojection": 1.4676812887191772
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0153.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0153.png",
       "charuco_corners": 42,
-      "mean_reprojection": 1.1982958316802979
+      "mean_reprojection": 1.198366403579712
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0154.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0154.png",
       "charuco_corners": 39,
-      "mean_reprojection": 0.9792419075965881
+      "mean_reprojection": 0.9792377948760986
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0155.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0155.png",
       "charuco_corners": 42,
       "mean_reprojection": 1.0805572271347046
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0156.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0156.png",
       "charuco_corners": 54,
       "mean_reprojection": 1.1035661697387695
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0157.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0157.png",
       "charuco_corners": 35,
       "mean_reprojection": 1.2179465293884277
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0158.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0158.png",
       "charuco_corners": 46,
-      "mean_reprojection": 1.3229976892471313
+      "mean_reprojection": 1.322998046875
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0160.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0160.png",
       "charuco_corners": 35,
       "mean_reprojection": 1.2506612539291382
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0161.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0161.png",
       "charuco_corners": 40,
-      "mean_reprojection": 1.2478431463241577
+      "mean_reprojection": 1.2478454113006592
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0162.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0162.png",
       "charuco_corners": 39,
       "mean_reprojection": 1.3079407215118408
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0163.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0163.png",
       "charuco_corners": 37,
       "mean_reprojection": 1.5667788982391357
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0164.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0164.png",
       "charuco_corners": 44,
-      "mean_reprojection": 1.118404507637024
+      "mean_reprojection": 1.1184037923812866
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0168.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0168.png",
       "charuco_corners": 37,
       "mean_reprojection": 1.1759761571884155
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0169.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0169.png",
       "charuco_corners": 50,
-      "mean_reprojection": 1.229953646659851
+      "mean_reprojection": 1.2299023866653442
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0171.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0171.png",
       "charuco_corners": 42,
-      "mean_reprojection": 1.0623079538345337
+      "mean_reprojection": 1.0623823404312134
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0173.png",
-      "charuco_corners": 49,
-      "mean_reprojection": 1.1163463592529297
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0173.png",
+      "charuco_corners": 50,
+      "mean_reprojection": 1.1632112264633179
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0267.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0267.png",
       "charuco_corners": 38,
       "mean_reprojection": 1.43490731716156
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0274.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0274.png",
       "charuco_corners": 42,
       "mean_reprojection": 1.2889772653579712
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0275.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0275.png",
       "charuco_corners": 47,
-      "mean_reprojection": 1.5755555629730225
+      "mean_reprojection": 1.5755589008331299
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0278.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0278.png",
       "charuco_corners": 47,
-      "mean_reprojection": 1.328981876373291
+      "mean_reprojection": 1.3289825916290283
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0279.png",
-      "charuco_corners": 41,
-      "mean_reprojection": 1.5777673721313477
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0279.png",
+      "charuco_corners": 43,
+      "mean_reprojection": 1.565122365951538
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0280.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0280.png",
       "charuco_corners": 49,
-      "mean_reprojection": 1.4896799325942993
+      "mean_reprojection": 1.4896790981292725
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0281.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0281.png",
       "charuco_corners": 52,
       "mean_reprojection": 1.462565302848816
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0282.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0282.png",
       "charuco_corners": 44,
-      "mean_reprojection": 1.5407885313034058
+      "mean_reprojection": 1.5407898426055908
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0283.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0283.png",
       "charuco_corners": 51,
       "mean_reprojection": 1.2876533269882202
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0284.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0284.png",
       "charuco_corners": 48,
-      "mean_reprojection": 1.4234013557434082
+      "mean_reprojection": 1.4234027862548828
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0285.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0285.png",
       "charuco_corners": 53,
-      "mean_reprojection": 1.2687655687332153
+      "mean_reprojection": 1.2687623500823975
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0286.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0286.png",
       "charuco_corners": 53,
-      "mean_reprojection": 1.3241360187530518
+      "mean_reprojection": 1.32413649559021
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0287.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0287.png",
       "charuco_corners": 54,
-      "mean_reprojection": 1.2889444828033447
+      "mean_reprojection": 1.2889432907104492
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0289.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0289.png",
       "charuco_corners": 50,
-      "mean_reprojection": 1.3617219924926758
+      "mean_reprojection": 1.3617222309112549
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0290.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0290.png",
       "charuco_corners": 47,
-      "mean_reprojection": 1.060179352760315
+      "mean_reprojection": 1.0601807832717896
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0291.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0291.png",
       "charuco_corners": 37,
-      "mean_reprojection": 1.311720848083496
+      "mean_reprojection": 1.311726689338684
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0292.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0292.png",
       "charuco_corners": 44,
       "mean_reprojection": 1.3520020246505737
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0293.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0293.png",
       "charuco_corners": 43,
-      "mean_reprojection": 1.2630610466003418
+      "mean_reprojection": 1.2630599737167358
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0294.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0294.png",
       "charuco_corners": 39,
-      "mean_reprojection": 1.3726609945297241
+      "mean_reprojection": 1.3726606369018555
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0295.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0295.png",
       "charuco_corners": 35,
-      "mean_reprojection": 1.2450445890426636
+      "mean_reprojection": 1.2450460195541382
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0296.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0296.png",
       "charuco_corners": 42,
-      "mean_reprojection": 1.1778457164764404
+      "mean_reprojection": 1.177844762802124
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0297.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0297.png",
       "charuco_corners": 40,
-      "mean_reprojection": 1.1803686618804932
+      "mean_reprojection": 1.1803697347640991
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0298.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0298.png",
       "charuco_corners": 43,
-      "mean_reprojection": 1.2386313676834106
+      "mean_reprojection": 1.2386341094970703
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0299.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0299.png",
       "charuco_corners": 39,
       "mean_reprojection": 1.2541710138320923
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0300.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0300.png",
       "charuco_corners": 46,
-      "mean_reprojection": 1.2021821737289429
+      "mean_reprojection": 1.2021843194961548
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0301.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0301.png",
       "charuco_corners": 35,
       "mean_reprojection": 1.0108113288879395
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0302.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0302.png",
       "charuco_corners": 37,
-      "mean_reprojection": 1.1181148290634155
+      "mean_reprojection": 1.1181164979934692
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0303.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0303.png",
       "charuco_corners": 43,
-      "mean_reprojection": 1.2511202096939087
+      "mean_reprojection": 1.251118779182434
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0305.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0305.png",
       "charuco_corners": 45,
-      "mean_reprojection": 1.0926899909973145
+      "mean_reprojection": 1.0926889181137085
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0306.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0306.png",
       "charuco_corners": 41,
       "mean_reprojection": 1.4349331855773926
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0307.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0307.png",
       "charuco_corners": 38,
-      "mean_reprojection": 1.0558221340179443
+      "mean_reprojection": 1.0558220148086548
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0308.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0308.png",
       "charuco_corners": 40,
       "mean_reprojection": 1.1038963794708252
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0309.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0309.png",
       "charuco_corners": 54,
-      "mean_reprojection": 1.3339537382125854
+      "mean_reprojection": 1.333954930305481
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0310.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0310.png",
       "charuco_corners": 47,
-      "mean_reprojection": 1.027660608291626
+      "mean_reprojection": 1.0276604890823364
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0311.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0311.png",
       "charuco_corners": 51,
-      "mean_reprojection": 1.1578277349472046
+      "mean_reprojection": 1.1578298807144165
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0312.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0312.png",
       "charuco_corners": 54,
-      "mean_reprojection": 1.194434404373169
+      "mean_reprojection": 1.1944334506988525
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0313.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0313.png",
       "charuco_corners": 47,
-      "mean_reprojection": 1.230122447013855
+      "mean_reprojection": 1.230764389038086
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0314.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0314.png",
       "charuco_corners": 38,
       "mean_reprojection": 1.0903079509735107
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0315.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0315.png",
       "charuco_corners": 59,
-      "mean_reprojection": 1.3308131694793701
+      "mean_reprojection": 1.3308136463165283
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0316.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0316.png",
       "charuco_corners": 50,
       "mean_reprojection": 1.1425034999847412
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0317.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0317.png",
       "charuco_corners": 49,
-      "mean_reprojection": 1.197363018989563
+      "mean_reprojection": 1.1973642110824585
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0319.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0319.png",
       "charuco_corners": 45,
       "mean_reprojection": 1.1736547946929932
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0320.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0320.png",
       "charuco_corners": 47,
-      "mean_reprojection": 1.2495074272155762
+      "mean_reprojection": 1.2495086193084717
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0321.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0321.png",
       "charuco_corners": 46,
       "mean_reprojection": 1.1344830989837646
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0322.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0322.png",
       "charuco_corners": 35,
       "mean_reprojection": 1.1475348472595215
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0323.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0323.png",
       "charuco_corners": 60,
-      "mean_reprojection": 1.216903805732727
+      "mean_reprojection": 1.2169015407562256
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0324.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0324.png",
       "charuco_corners": 46,
-      "mean_reprojection": 1.3860361576080322
+      "mean_reprojection": 1.386036992073059
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0325.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0325.png",
       "charuco_corners": 48,
       "mean_reprojection": 1.320452332496643
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0326.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0326.png",
       "charuco_corners": 47,
       "mean_reprojection": 1.3591021299362183
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0327.png",
-      "charuco_corners": 46,
-      "mean_reprojection": 1.2855567932128906
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0327.png",
+      "charuco_corners": 44,
+      "mean_reprojection": 1.2594428062438965
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0328.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0328.png",
       "charuco_corners": 48,
-      "mean_reprojection": 1.102246642112732
+      "mean_reprojection": 1.1022478342056274
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0329.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0329.png",
       "charuco_corners": 36,
-      "mean_reprojection": 1.4165773391723633
+      "mean_reprojection": 1.4165805578231812
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0330.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0330.png",
       "charuco_corners": 50,
-      "mean_reprojection": 1.4145039319992065
+      "mean_reprojection": 1.4145033359527588
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0331.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0331.png",
       "charuco_corners": 53,
-      "mean_reprojection": 1.2188036441802979
+      "mean_reprojection": 1.2188042402267456
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0332.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0332.png",
       "charuco_corners": 56,
-      "mean_reprojection": 1.4436403512954712
+      "mean_reprojection": 1.4440135955810547
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0333.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0333.png",
       "charuco_corners": 54,
-      "mean_reprojection": 1.329280972480774
+      "mean_reprojection": 1.3299466371536255
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0334.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0334.png",
       "charuco_corners": 58,
       "mean_reprojection": 1.2809343338012695
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0335.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0335.png",
       "charuco_corners": 56,
       "mean_reprojection": 1.439733862876892
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0336.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0336.png",
       "charuco_corners": 49,
-      "mean_reprojection": 1.516271948814392
+      "mean_reprojection": 1.5162713527679443
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0337.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0337.png",
       "charuco_corners": 54,
-      "mean_reprojection": 1.435439109802246
+      "mean_reprojection": 1.4350019693374634
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0338.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0338.png",
       "charuco_corners": 50,
-      "mean_reprojection": 1.474662184715271
+      "mean_reprojection": 1.4746612310409546
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0339.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0339.png",
       "charuco_corners": 49,
-      "mean_reprojection": 1.3456870317459106
+      "mean_reprojection": 1.345687985420227
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0340.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0340.png",
       "charuco_corners": 52,
       "mean_reprojection": 1.4339210987091064
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0341.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0341.png",
       "charuco_corners": 58,
-      "mean_reprojection": 1.6746312379837036
+      "mean_reprojection": 1.6746314764022827
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0342.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0342.png",
       "charuco_corners": 44,
-      "mean_reprojection": 1.4152181148529053
+      "mean_reprojection": 1.41521418094635
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0343.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0343.png",
       "charuco_corners": 53,
-      "mean_reprojection": 1.3504247665405273
+      "mean_reprojection": 1.3504258394241333
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0344.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0344.png",
       "charuco_corners": 54,
-      "mean_reprojection": 1.4205658435821533
+      "mean_reprojection": 1.4205670356750488
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0345.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0345.png",
       "charuco_corners": 52,
-      "mean_reprojection": 1.6010991334915161
+      "mean_reprojection": 1.6012789011001587
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0346.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0346.png",
       "charuco_corners": 60,
-      "mean_reprojection": 1.6279550790786743
+      "mean_reprojection": 1.627953052520752
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0347.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0347.png",
       "charuco_corners": 52,
-      "mean_reprojection": 1.7528700828552246
+      "mean_reprojection": 1.752871036529541
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0348.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0348.png",
       "charuco_corners": 54,
-      "mean_reprojection": 1.500074863433838
+      "mean_reprojection": 1.5000739097595215
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0349.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0349.png",
       "charuco_corners": 47,
       "mean_reprojection": 1.5165024995803833
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0350.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0350.png",
       "charuco_corners": 46,
-      "mean_reprojection": 1.4932639598846436
+      "mean_reprojection": 1.4932632446289062
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0351.png",
-      "charuco_corners": 48,
-      "mean_reprojection": 1.8651319742202759
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0351.png",
+      "charuco_corners": 44,
+      "mean_reprojection": 1.913230538368225
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0352.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0352.png",
       "charuco_corners": 43,
-      "mean_reprojection": 1.606480598449707
+      "mean_reprojection": 1.606481909751892
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0353.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0353.png",
       "charuco_corners": 55,
-      "mean_reprojection": 1.676992416381836
+      "mean_reprojection": 1.6769942045211792
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0354.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0354.png",
       "charuco_corners": 46,
-      "mean_reprojection": 1.4317255020141602
+      "mean_reprojection": 1.4317268133163452
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0355.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0355.png",
       "charuco_corners": 48,
-      "mean_reprojection": 1.6589323282241821
+      "mean_reprojection": 1.6589330434799194
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0356.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0356.png",
       "charuco_corners": 49,
-      "mean_reprojection": 1.5335218906402588
+      "mean_reprojection": 1.5335206985473633
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0357.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0357.png",
       "charuco_corners": 45,
-      "mean_reprojection": 1.569191813468933
+      "mean_reprojection": 1.5691914558410645
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0358.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0358.png",
       "charuco_corners": 39,
-      "mean_reprojection": 1.6858373880386353
+      "mean_reprojection": 1.6858367919921875
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0359.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0359.png",
       "charuco_corners": 49,
-      "mean_reprojection": 1.7116820812225342
+      "mean_reprojection": 1.711682677268982
     },
     {
-      "image": "scanner_asteroid_new_checkerboard\\checkerboard0360.png",
+      "image": "scanner_asteroid_new_checkerboard/checkerboard0360.png",
       "charuco_corners": 48,
-      "mean_reprojection": 1.5455602407455444
+      "mean_reprojection": 1.5455611944198608
     }
   ]
 }

@@ -1,10 +1,10 @@
 {
-  "reconstruction_to_ground_truth_mean": 0.23380136639504148,
-  "ground_truth_to_reconstruction_mean": 0.3455114576692544,
-  "chamfer_l1_mean": 0.2896564120321479,
-  "chamfer_l2_mean": 0.1290024009330682,
-  "reconstruction_to_ground_truth_p95": 0.5148291020846382,
-  "ground_truth_to_reconstruction_p95": 0.8145460403075311,
+  "reconstruction_to_ground_truth_mean": 0.23387204311821624,
+  "ground_truth_to_reconstruction_mean": 0.34481280861179403,
+  "chamfer_l1_mean": 0.28934242586500514,
+  "chamfer_l2_mean": 0.12828970975921825,
+  "reconstruction_to_ground_truth_p95": 0.5143680230398997,
+  "ground_truth_to_reconstruction_p95": 0.8124956862948663,
   "dataset": "asteroid",
   "sample_count": 30000,
   "ground_truth_aligned_by_bbox": true
