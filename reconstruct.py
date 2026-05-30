@@ -120,7 +120,9 @@ def reconstruct(config):
     max_z = recon_cfg.get("max_z")
     radius_z_gate = recon_cfg.get("radius_z_gate")
 
-    coord_files = sorted(glob.glob(os.path.join(config["paths"]["stripe_coords_dir"], "*.npy")))
+    input_glob = config["paths"].get("input_glob", "*.png")
+    npy_glob = os.path.splitext(input_glob)[0] + ".npy"
+    coord_files = sorted(glob.glob(os.path.join(config["paths"]["stripe_coords_dir"], npy_glob)))
 
     all_points = []
 

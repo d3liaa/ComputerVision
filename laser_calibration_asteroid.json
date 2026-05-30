@@ -2,50 +2,50 @@
   "dataset": "asteroid",
   "camera_plane": {
     "normal": [
-      0.9948220265866914,
-      -0.09936283253782892,
-      -0.021357971064868635
+      0.9671116898142122,
+      -0.21918930031840883,
+      0.12903887030900965
     ],
     "point": [
-      0.025842843574175246,
-      -0.40172003234603454,
-      6.087917188125244
+      0.12684186602883207,
+      -0.5052034923787901,
+      7.103491347894757
     ]
   },
   "world_plane": {
     "normal": [
-      0.9948220265866914,
-      0.022635652077375574,
-      0.0990795774767959
+      0.9671116898142122,
+      0.2095823340841939,
+      0.14411878664671157
     ],
     "point": [
-      0.025842843574175246,
-      -1.3126990237913259,
-      1.7912170138570078
+      0.12684186602883207,
+      -0.34854225448105774,
+      1.4558046934436275
     ]
   },
-  "total_points": 1176,
-  "kept_points": 981,
+  "total_points": 1089,
+  "kept_points": 934,
   "images": [
     {
       "image": "scanner_asteroid_new_checkerboards\\checkerboard_1.png",
-      "used_points": 325,
+      "used_points": 290,
       "charuco_corners": 63
     },
     {
       "image": "scanner_asteroid_new_checkerboards\\checkerboard_2.png",
-      "used_points": 199,
-      "charuco_corners": 66
+      "used_points": 188,
+      "charuco_corners": 64
     },
     {
       "image": "scanner_asteroid_new_checkerboards\\checkerboard_3.png",
-      "used_points": 290,
-      "charuco_corners": 58
+      "used_points": 291,
+      "charuco_corners": 70
     },
     {
       "image": "scanner_asteroid_new_checkerboards\\checkerboard_4.png",
-      "used_points": 362,
-      "charuco_corners": 66
+      "used_points": 320,
+      "charuco_corners": 70
     }
   ]
 }

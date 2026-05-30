@@ -19,14 +19,14 @@
     },
     "laser": {
       "point": [
-        0.029691462323246876,
-        -0.46572354315258174,
-        1.4622762690587743
+        0.12684186602883207,
+        -0.34854225448105774,
+        1.4558046934436275
       ],
       "normal": [
-        0.9948220265705917,
-        0.022635651546755214,
-        0.09907957775967186
+        0.9671116898142122,
+        0.2095823340841939,
+        0.14411878664671157
       ]
     },
     "stripe": {
@@ -78,7 +78,7 @@
     },
     "paths": {
       "input_dir": "scanner_asteroid_new",
-      "input_glob": "*.png",
+      "input_glob": "asteroid20grad*.png",
       "stripe_masks_dir": "stripe_masks_asteroid_new",
       "stripe_coords_dir": "stripe_coords_asteroid_new",
       "point_cloud": "point_cloud_asteroid_new.ply",
