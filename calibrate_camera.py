@@ -63,6 +63,118 @@ def robust_fit_circle_3d(points, iterations=4):
     return center, axis, radius, residuals, keep
 
 
+def estimate_disk_axis_camera(rotations, min_angle_deg=3.0, stride=5, max_gap=40):
+    """Disk axis in camera frame from the relative rotation between board poses.
+
+    The board is fixed to the turntable, so between two frames its pose differs
+    by a pure rotation about the disk axis. Averaging the axis of many such
+    relative rotations is far more robust than fitting a circle to the noisy
+    board translations.
+    """
+    axes = []
+    count = len(rotations)
+    for i in range(count):
+        for j in range(i + stride, min(i + max_gap, count)):
+            relative = rotations[j] @ rotations[i].T
+            cos_angle = np.clip((np.trace(relative) - 1.0) / 2.0, -1.0, 1.0)
+            if np.arccos(cos_angle) < np.radians(min_angle_deg):
+                continue
+            axis = np.array([
+                relative[2, 1] - relative[1, 2],
+                relative[0, 2] - relative[2, 0],
+                relative[1, 0] - relative[0, 1],
+            ])
+            norm = np.linalg.norm(axis)
+            if norm < 1e-8:
+                continue
+            axes.append(axis / norm)
+    if len(axes) < 5:
+        raise ValueError("Not enough rotated board pairs to estimate the disk axis")
+    axes = np.asarray(axes)
+    axes[axes @ axes[0] < 0] *= -1.0
+    axis = axes.mean(axis=0)
+    spread = float(np.degrees(np.std(np.arccos(np.clip(axes @ (axis / np.linalg.norm(axis)), -1.0, 1.0)))))
+    return axis / np.linalg.norm(axis), spread
+
+
+def solve_rotation_center_camera(rotations, translations, axis_camera, stride=5, max_gap=40):
+    """Turntable origin in camera frame as the fixed point of the disk rotation.
+
+    For a turntable-fixed point the board origin satisfies
+        (R_ij - I) c = (R_ij - I) t_i - (t_j - t_i)
+    where R_ij is the relative rotation between frames i and j. Stacking many
+    pairs and solving in least squares gives the rotation centre. The component
+    along the axis is unconstrained, so it is pinned to the mean projection.
+    """
+    a_blocks = []
+    b_blocks = []
+    count = len(rotations)
+    eye = np.eye(3)
+    for i in range(count):
+        for j in range(i + stride, min(i + max_gap, count)):
+            relative = rotations[j] @ rotations[i].T
+            diff = relative - eye
+            a_blocks.append(diff)
+            b_blocks.append(diff @ translations[i] - (translations[j] - translations[i]))
+    a_matrix = np.vstack(a_blocks)
+    b_vector = np.concatenate(b_blocks)
+    center, *_ = np.linalg.lstsq(a_matrix, b_vector, rcond=None)
+    center = center - axis_camera * float((center - translations.mean(axis=0)) @ axis_camera)
+    return center
+
+
+def rotation_about_axis(axis, theta):
+    axis = axis / np.linalg.norm(axis)
+    cross = np.array([[0.0, -axis[2], axis[1]],
+                      [axis[2], 0.0, -axis[0]],
+                      [-axis[1], axis[0], 0.0]])
+    return np.eye(3) + np.sin(theta) * cross + (1.0 - np.cos(theta)) * (cross @ cross)
+
+
+def solve_rotation_center_corners(rotations, translations, board, axis_camera):
+    """Turntable origin in camera frame from every board corner, not just the
+    origin. Each corner, after unrotating its frame angle about the disk axis,
+    must map to a constant point. This uses thousands of constraints and is far
+    less sensitive to the anisotropic depth noise of a single board pose.
+
+    Tangential (image-plane) accuracy is excellent; the residual error sits
+    along the camera viewing direction, i.e. it is a harmless global scale that
+    is shared with the laser plane (calibrated from the same board) and removed
+    by the metric alignment.
+    """
+    object_corners = board.getChessboardCorners().astype(np.float64)  # (M, 3)
+    reference = rotations[0]
+    angles = []
+    for rotation in rotations:
+        rotation_vector, _ = cv2.Rodrigues(rotation @ reference.T)
+        angles.append(float(rotation_vector.ravel() @ axis_camera))
+
+    rotated_corners = []   # A_f @ P_{f}
+    frame_b = []           # B_f = I - A_f
+    for rotation, translation, angle in zip(rotations, translations, angles):
+        corners_camera = (rotation @ object_corners.T).T + translation  # (M, 3)
+        unrotate = rotation_about_axis(axis_camera, -angle)
+        rotated_corners.append((unrotate @ corners_camera.T).T)
+        frame_b.append(np.eye(3) - unrotate)
+
+    mean_rotated = np.mean(np.stack(rotated_corners), axis=0)  # (M, 3)
+    mean_b = np.mean(np.stack(frame_b), axis=0)                # (3, 3)
+
+    corner_count = object_corners.shape[0]
+    e_rows = []
+    d_rows = []
+    for rotated, b_matrix in zip(rotated_corners, frame_b):
+        e_frame = b_matrix - mean_b          # (3, 3), shared by all corners
+        d_frame = rotated - mean_rotated     # (M, 3)
+        e_rows.extend([e_frame] * corner_count)
+        d_rows.append(d_frame.ravel())
+    e_matrix = np.vstack(e_rows)
+    d_vector = np.concatenate(d_rows)
+    center, *_ = np.linalg.lstsq(e_matrix, -d_vector, rcond=None)
+    center = center - axis_camera * float((center - translations.mean(axis=0)) @ axis_camera)
+    return center
+
+
 def detect_board_poses(image_paths, board, camera_matrix, dist_coeffs, min_corners):
     detector = cv2.aruco.CharucoDetector(board)
     board_corners = board.getChessboardCorners()
@@ -159,8 +271,22 @@ def calibrate_camera(root_config, max_frames=90, min_corners=12):
         raise ValueError(f"Only {len(records)} usable board poses found; need at least 10")
 
     translations = np.array([record["tvec"] for record in records], dtype=np.float64)
-    disk_center_cam, disk_axis_cam, radius, circle_residuals, pose_keep = robust_fit_circle_3d(translations)
-    fit_translations = translations[pose_keep]
+    rotations = [cv2.Rodrigues(record["rvec"])[0] for record in records]
+
+    # Robust disk axis (relative rotation) and centre (corner fixed point).
+    disk_axis_cam, axis_spread_deg = estimate_disk_axis_camera(rotations)
+    disk_center_cam = solve_rotation_center_corners(rotations, translations, board, disk_axis_cam)
+
+    # Perpendicular distance of each board origin to the axis line = turntable radius.
+    offsets = translations - disk_center_cam
+    perp = offsets - np.outer(offsets @ disk_axis_cam, disk_axis_cam)
+    radii = np.linalg.norm(perp, axis=1)
+    radius = float(np.median(radii))
+    circle_residuals = np.abs(radii - radius)
+    pose_keep = np.ones(len(records), dtype=bool)
+    fit_translations = translations
+
+    # World-frame report (uses the ground-truth pose if present; for inspection only).
     disk_center_world = camera_to_world_point(disk_center_cam, config["camera"])
     disk_axis_world = camera_to_world_vector(disk_axis_cam, config["camera"])
     disk_axis_world /= np.linalg.norm(disk_axis_world)
@@ -191,6 +317,7 @@ def calibrate_camera(root_config, max_frames=90, min_corners=12):
         "disk_radius_camera": float(radius),
         "disk_circle_residual_mean": float(np.mean(circle_residuals)),
         "disk_circle_residual_p95": float(np.percentile(circle_residuals, 95)),
+        "disk_axis_spread_deg": float(axis_spread_deg),
         "disk_center_camera": disk_center_cam.tolist(),
         "disk_axis_camera": disk_axis_cam.tolist(),
         "disk_center_world": disk_center_world.tolist(),
@@ -238,16 +365,26 @@ def main():
     print(f"fx={k[0,0]:.2f}  fy={k[1,1]:.2f}  cx={k[0,2]:.2f}  cy={k[1,2]:.2f}")
     print(f"disk_center_world: {result['disk_center_world']}")
     print(f"disk_axis_world:   {result['disk_axis_world']}")
+    print(f"disk_axis_spread:  {result['disk_axis_spread_deg']:.3f} deg")
     print(f"estimated_camera_location: {result['estimated_extrinsics']['camera_location_world']}")
     print(f"poses used: {result['poses_used']} / {result['frames_sampled']} sampled / {result['frames_total']} total")
 
     if args.update_config:
         config = root_config[dataset_name]
-        config["disk"]["center"] = [round(v, 6) for v in result["disk_center_world"]]
-        config["disk"]["axis"] = [round(v, 6) for v in result["disk_axis_world"]]
+        extrinsics = result["estimated_extrinsics"]
+        # World == turntable frame: write the estimated camera pose and make the
+        # disk canonical. Nothing here comes from the Blender ground truth.
+        config["camera"]["world_to_camera_rotation"] = [
+            [round(v, 10) for v in row] for row in extrinsics["world_to_camera_rotation"]
+        ]
+        config["camera"]["world_to_camera_translation"] = [
+            round(v, 10) for v in extrinsics["world_to_camera_translation"]
+        ]
+        config["disk"]["center"] = [0.0, 0.0, 0.0]
+        config["disk"]["axis"] = [0.0, 0.0, 1.0]
         with open(args.config, "w") as f:
             json.dump(root_config, f, indent=2)
-        print(f"Updated {args.config} with calibrated disk parameters.")
+        print(f"Updated {args.config} with estimated camera extrinsics and canonical disk frame.")
 
 
 if __name__ == "__main__":

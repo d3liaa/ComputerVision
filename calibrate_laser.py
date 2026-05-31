@@ -29,23 +29,40 @@ def build_charuco_board(charuco_cfg):
 def detect_board_pose(image_gray, board, camera_matrix):
     detector = cv2.aruco.CharucoDetector(board)
     charuco_corners, charuco_ids, _marker_corners, _marker_ids = detector.detectBoard(image_gray)
-    if charuco_ids is None or len(charuco_ids) < 6:
+    if charuco_ids is None or len(charuco_ids) < 8:
         return None
 
     object_points = board.getChessboardCorners()[charuco_ids.ravel()].astype(np.float32)
     image_points = charuco_corners.reshape(-1, 2).astype(np.float32)
-    ok, rotation_vec, translation_vec = cv2.solvePnP(
+
+    # The laser stripe corrupts the ChArUco corners it crosses, so a plain
+    # solvePnP over every corner is dragged off by those outliers. RANSAC keeps
+    # only the corners consistent with a single rigid pose, then we refine on
+    # that inlier set.
+    ok, rotation_vec, translation_vec, inliers = cv2.solvePnPRansac(
         object_points,
         image_points,
         camera_matrix,
         np.zeros((5, 1), dtype=np.float64),
+        reprojectionError=2.5,
+        iterationsCount=500,
         flags=cv2.SOLVEPNP_ITERATIVE,
     )
-    if not ok:
+    if not ok or inliers is None or len(inliers) < 6:
         return None
 
+    inlier_idx = inliers.ravel()
+    rotation_vec, translation_vec = cv2.solvePnPRefineLM(
+        object_points[inlier_idx],
+        image_points[inlier_idx],
+        camera_matrix,
+        np.zeros((5, 1), dtype=np.float64),
+        rotation_vec,
+        translation_vec,
+    )
+
     rotation_board, _jacobian = cv2.Rodrigues(rotation_vec)
-    return rotation_board, translation_vec.reshape(3), len(charuco_ids)
+    return rotation_board, translation_vec.reshape(3), int(len(inlier_idx))
 
 
 def project_board_polygon(rotation_board, translation_board, board, camera_matrix):

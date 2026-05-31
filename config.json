@@ -1,6 +1,6 @@
 {
-  "active": "asteroid",
-  "asteroid": {
+  "active": "moon",
+  "suzanne": {
     "camera": {
       "focal_length_mm": 35,
       "sensor_width_mm": 32,
@@ -15,18 +15,40 @@
         65,
         0,
         0
+      ],
+      "world_to_camera_rotation": [
+        [
+          0.8927275578,
+          0.4504938772,
+          0.0096319313
+        ],
+        [
+          0.1915088549,
+          -0.3599835767,
+          -0.9130915524
+        ],
+        [
+          -0.4078748166,
+          0.8169865917,
+          -0.4076408259
+        ]
+      ],
+      "world_to_camera_translation": [
+        -0.0051008122,
+        0.6895934313,
+        9.1380585878
       ]
     },
     "laser": {
       "point": [
-        0.12684186516925772,
-        -0.34854226920479414,
-        1.455804699179507
+        0.0579204697385545,
+        0.3715170789589568,
+        1.409356230407496
       ],
       "normal": [
-        -0.967111690405594,
-        -0.209582332211665,
-        -0.14411878540132758
+        -0.6939581902886691,
+        -0.7124349371195129,
+        -0.104204081027526
       ]
     },
     "stripe": {
@@ -44,49 +66,168 @@
     },
     "reconstruction": {
       "min_abs_plane_denom": 1e-05,
-      "max_radius": 6.5,
-      "min_z": -0.25,
-      "max_z": 4.0
+      "max_radius": 1.7,
+      "min_z": 0.12,
+      "max_z": 3.2,
+      "radius_z_gate": {
+        "min_z": -1.0,
+        "max_z": 0.35,
+        "max_radius": 0.6
+      }
     },
     "calibration": {
       "charuco": {
         "squares_x": 11,
         "squares_y": 8,
         "dictionary": "DICT_4X4_50",
-        "square_length": 0.2177750878062099,
-        "marker_length_ratio": 0.7,
+        "square_length": 0.195,
+        "marker_length_ratio": 0.7333,
         "legacy_pattern": true
       },
-      "camera_board_dir": "scanner_asteroid_new_checkerboard",
-      "laser_board_dir": "scanner_asteroid_new_checkerboards",
+      "camera_board_dir": "scanner_checkerboard_for_camera",
+      "laser_board_dir": "scanner_checkerboards_for_laser",
       "laser_board_glob": "*.png",
-      "laser_calibration_output": "laser_calibration_asteroid.json"
+      "laser_calibration_output": "laser_calibration_suzanne.json"
     },
     "disk": {
       "center": [
-        0,
-        0,
-        0
+        0.0,
+        0.0,
+        0.0
       ],
       "axis": [
-        0,
-        0,
-        1
+        0.0,
+        0.0,
+        1.0
       ],
       "n_frames": 360,
       "angle_per_frame_deg": 1.0
     },
     "paths": {
-      "input_dir": "scanner_asteroid_new",
-      "input_glob": "asteroid20grad*.png",
-      "stripe_masks_dir": "stripe_masks_asteroid_new",
-      "stripe_coords_dir": "stripe_coords_asteroid_new",
-      "point_cloud": "point_cloud_asteroid_new.ply",
-      "reconstructed_mesh": "mesh_asteroid_new.ply",
-      "reconstructed_mesh_obj": "blender/mesh_asteroid_new.obj",
-      "ground_truth_mesh": "blender/asteroid_ground_truth.stl",
-      "metrics": "metrics_asteroid_new.json"
+      "input_dir": "scanner_suzanne",
+      "input_glob": "suzanne*.png",
+      "stripe_masks_dir": "stripe_masks_suzanne",
+      "stripe_coords_dir": "stripe_coords_suzanne",
+      "point_cloud": "point_cloud_suzanne.ply",
+      "reconstructed_mesh": "mesh_suzanne.ply",
+      "reconstructed_mesh_obj": "blender/mesh_suzanne.obj",
+      "ground_truth_mesh": "blender/suzanne.obj",
+      "metrics": "metrics_suzanne.json"
     }
   },
-  "moon": {}
+  "moon": {
+    "camera": {
+      "focal_length_mm": 35,
+      "sensor_width_mm": 32,
+      "image_width": 1024,
+      "image_height": 1024,
+      "location": [
+        0,
+        -7,
+        4
+      ],
+      "rotation_euler_deg": [
+        65,
+        0,
+        0
+      ],
+      "world_to_camera_rotation": [
+        [
+          0.9857938124,
+          0.1679563944,
+          0.0010995966
+        ],
+        [
+          0.0721300874,
+          -0.4174257933,
+          -0.9058437821
+        ],
+        [
+          -0.1516832555,
+          0.8930545094,
+          -0.4236104735
+        ]
+      ],
+      "world_to_camera_translation_unused": [
+        -0.0051008122,
+        0.6895934313,
+        9.1380585878
+      ],
+      "world_to_camera_translation": [
+        -0.0009305783,
+        0.5075941424,
+        6.8335285075
+      ]
+    },
+    "laser": {
+      "point": [
+        0.04441647527158273,
+        0.08292015667168062,
+        0.8628456745138342
+      ],
+      "normal": [
+        -0.8635979441035394,
+        -0.4968200190725385,
+        -0.08583973199458657
+      ]
+    },
+    "stripe": {
+      "min_red": 120,
+      "min_red_excess": 20,
+      "scan_axis": "auto",
+      "peak_window_radius": 4,
+      "min_peak_width_px": 1,
+      "max_row": 600,
+      "kmeans": {
+        "enabled": true,
+        "clusters": 3,
+        "min_points": 25
+      }
+    },
+    "reconstruction": {
+      "min_abs_plane_denom": 1e-05,
+      "max_radius": 1.3,
+      "min_z": -0.3,
+      "max_z": 1.9
+    },
+    "calibration": {
+      "charuco": {
+        "squares_x": 11,
+        "squares_y": 8,
+        "dictionary": "DICT_4X4_50",
+        "square_length": 0.195,
+        "marker_length_ratio": 0.7333,
+        "legacy_pattern": true
+      },
+      "camera_board_dir": "scanner_checkerboard_for_camera",
+      "laser_board_dir": "scanner_checkerboards_for_laser",
+      "laser_board_glob": "*.png",
+      "laser_calibration_output": "laser_calibration_moon.json"
+    },
+    "disk": {
+      "center": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "axis": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "n_frames": 360,
+      "angle_per_frame_deg": 1.0
+    },
+    "paths": {
+      "input_dir": "scanner_moon",
+      "input_glob": "moon*.png",
+      "stripe_masks_dir": "stripe_masks_moon",
+      "stripe_coords_dir": "stripe_coords_moon",
+      "point_cloud": "point_cloud_moon.ply",
+      "reconstructed_mesh": "mesh_moon.ply",
+      "reconstructed_mesh_obj": "blender/mesh_moon.obj",
+      "ground_truth_mesh": "blender/moondisplace7_ground_truth.stl",
+      "metrics": "metrics_moon.json"
+    }
+  }
 }

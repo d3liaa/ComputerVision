@@ -190,22 +190,36 @@ def make_point_cloud(points):
 def clean_point_cloud(point_cloud):
     if len(point_cloud.points) < 30:
         raise ValueError("Need at least 30 points for surface reconstruction")
-    cleaned, _ = point_cloud.remove_statistical_outlier(nb_neighbors=20, std_ratio=2.0)
+    cleaned, _ = point_cloud.remove_statistical_outlier(nb_neighbors=24, std_ratio=2.0)
+
+    # Keep only the largest connected cluster to drop detached laser-reflection
+    # blobs and stray floating points while preserving the main object.
+    if len(cleaned.points) >= 30:
+        labels = np.asarray(cleaned.cluster_dbscan(eps=0.06, min_points=14))
+        if labels.max() >= 0:
+            largest = np.bincount(labels[labels >= 0]).argmax()
+            keep = np.where(labels == largest)[0]
+            cleaned = cleaned.select_by_index(keep)
     return cleaned
 
 
-def estimate_normals(point_cloud):
+def estimate_normals(point_cloud, camera_location=None):
     bbox = point_cloud.get_axis_aligned_bounding_box()
     radius = max(float(np.linalg.norm(bbox.get_extent())) * 0.03, 1e-3)
     point_cloud.estimate_normals(
         search_param=o3d.geometry.KDTreeSearchParamHybrid(radius=radius, max_nn=40)
     )
-    point_cloud.orient_normals_consistent_tangent_plane(30)
+    if camera_location is not None:
+        point_cloud.orient_normals_towards_camera_location(
+            np.asarray(camera_location, dtype=np.float64)
+        )
+    else:
+        point_cloud.orient_normals_consistent_tangent_plane(30)
 
 
-def reconstruct_surface(points, out_path, depth=8, density_quantile=0.02):
+def reconstruct_surface(points, out_path, depth=9, density_quantile=0.04, camera_location=None):
     point_cloud = clean_point_cloud(make_point_cloud(points))
-    estimate_normals(point_cloud)
+    estimate_normals(point_cloud, camera_location=camera_location)
 
     mesh, densities = o3d.geometry.TriangleMesh.create_from_point_cloud_poisson(
         point_cloud, depth=depth
@@ -241,18 +255,63 @@ def sample_mesh(path, sample_count):
     return mesh.sample_points_uniformly(number_of_points=sample_count)
 
 
-def align_by_bbox(source, target):
-    source_bbox = source.get_axis_aligned_bounding_box()
-    target_bbox = target.get_axis_aligned_bounding_box()
-    source_extent = float(np.linalg.norm(source_bbox.get_extent()))
-    target_extent = float(np.linalg.norm(target_bbox.get_extent()))
-    scale = target_extent / source_extent if source_extent > 1e-12 else 1.0
+def align_by_centroid_scale(source, target):
+    """Coarse alignment by centroid + RMS-radius (isotropic) scale.
 
-    aligned_points = np.asarray(source.points)
-    aligned_points = (aligned_points - source_bbox.get_center()) * scale + target_bbox.get_center()
+    Unlike a bounding-box-diagonal match, the RMS radius about the centroid is
+    not dominated by a single extreme extent, so it stays well-behaved when the
+    reconstruction only covers a partial cap of the object. This only provides a
+    seed; the final scale is estimated jointly by scaling-ICP from the actually
+    overlapping points.
+    """
+    source_points = np.asarray(source.points)
+    target_points = np.asarray(target.points)
+    source_center = source_points.mean(axis=0)
+    target_center = target_points.mean(axis=0)
+    source_rms = float(np.sqrt(np.mean(np.sum((source_points - source_center) ** 2, axis=1))))
+    target_rms = float(np.sqrt(np.mean(np.sum((target_points - target_center) ** 2, axis=1))))
+    scale = target_rms / source_rms if source_rms > 1e-12 else 1.0
 
+    aligned_points = (source_points - source_center) * scale + target_center
     aligned = o3d.geometry.PointCloud()
     aligned.points = o3d.utility.Vector3dVector(aligned_points)
+    return aligned
+
+
+# Backwards-compatible alias (the bbox-diagonal version mis-scaled partial caps).
+align_by_bbox = align_by_centroid_scale
+
+
+def align_by_icp(source, target):
+    """Refine a coarse alignment with scaling-ICP.
+
+    The reconstruction lives in the estimated turntable frame, whose azimuth
+    (and handedness of the disk basis) is arbitrary relative to the ground-truth
+    mesh, and the estimated calibration only fixes scale up to a global gauge.
+    A coarse centroid/RMS match fixes translation and a rough scale but not the
+    rotation, so ICP is needed for a meaningful Chamfer distance. Scaling is
+    enabled so the final scale is estimated from the corresponding (overlapping)
+    points only, which is what makes the metric reflect true shape error rather
+    than a bounding-box artifact when coverage is partial. Several yaw seeds are
+    tried to avoid ICP settling in a wrong local minimum.
+    """
+    target_extent = float(np.linalg.norm(target.get_axis_aligned_bounding_box().get_extent()))
+    threshold = max(target_extent * 0.2, 1e-3)
+    center = source.get_center()
+    estimator = o3d.pipelines.registration.TransformationEstimationPointToPoint(with_scaling=True)
+    best = None
+    for yaw in np.linspace(0.0, 2.0 * np.pi, 8, endpoint=False):
+        seed = np.eye(4)
+        c, s = np.cos(yaw), np.sin(yaw)
+        seed[:3, :3] = np.array([[c, -s, 0.0], [s, c, 0.0], [0.0, 0.0, 1.0]])
+        seed[:3, 3] = center - seed[:3, :3] @ center
+        result = o3d.pipelines.registration.registration_icp(
+            source, target, threshold, seed, estimator,
+        )
+        if best is None or result.fitness > best.fitness:
+            best = result
+    aligned = o3d.geometry.PointCloud(source)
+    aligned.transform(best.transformation)
     return aligned
 
 
@@ -274,13 +333,15 @@ def validate_reconstruction(config, dataset_name, sample_count=30000):
     o3d.utility.random.seed(42)
     reconstruction = sample_mesh(paths["reconstructed_mesh"], sample_count)
     ground_truth = sample_mesh(paths["ground_truth_mesh"], sample_count)
-    ground_truth = align_by_bbox(ground_truth, reconstruction)
+    ground_truth = align_by_centroid_scale(ground_truth, reconstruction)
+    ground_truth = align_by_icp(ground_truth, reconstruction)
 
     metrics = chamfer_metrics(reconstruction, ground_truth)
     metrics.update({
         "dataset": dataset_name,
         "sample_count": sample_count,
-        "ground_truth_aligned_by_bbox": True,
+        "ground_truth_aligned_by_centroid_scale": True,
+        "ground_truth_aligned_by_scaling_icp": True,
     })
 
     with open(paths["metrics"], "w") as f:
