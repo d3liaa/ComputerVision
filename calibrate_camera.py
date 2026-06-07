@@ -11,6 +11,7 @@ from reconstruct import build_camera_matrix, build_extrinsics
 
 
 def select_image_paths(image_paths, max_frames):
+    # Function to subsample the images if one wants to use less frames than captured
     if max_frames is None or max_frames <= 0 or len(image_paths) <= max_frames:
         return image_paths
     indices = np.linspace(0, len(image_paths) - 1, int(max_frames), dtype=int)
@@ -18,6 +19,7 @@ def select_image_paths(image_paths, max_frames):
 
 
 def fit_circle_3d(points):
+    # Find the parameters of the circle that best fits the provided points
     points = np.asarray(points, dtype=np.float64)
     centroid = points.mean(axis=0)
     _, _, vh = np.linalg.svd(points - centroid, full_matrices=False)
@@ -38,6 +40,7 @@ def fit_circle_3d(points):
 
 
 def robust_fit_circle_3d(points, iterations=4):
+    # Find the parameters of the circle that best fits the provided points, rejecting outliers
     points = np.asarray(points, dtype=np.float64)
     keep = np.ones(len(points), dtype=bool)
 
@@ -64,13 +67,7 @@ def robust_fit_circle_3d(points, iterations=4):
 
 
 def estimate_disk_axis_camera(rotations, min_angle_deg=3.0, stride=5, max_gap=40):
-    """Disk axis in camera frame from the relative rotation between board poses.
-
-    The board is fixed to the turntable, so between two frames its pose differs
-    by a pure rotation about the disk axis. Averaging the axis of many such
-    relative rotations is far more robust than fitting a circle to the noisy
-    board translations.
-    """
+    # Estimate the turntable axis in camera coordinates
     axes = []
     count = len(rotations)
     for i in range(count):
@@ -98,14 +95,7 @@ def estimate_disk_axis_camera(rotations, min_angle_deg=3.0, stride=5, max_gap=40
 
 
 def solve_rotation_center_camera(rotations, translations, axis_camera, stride=5, max_gap=40):
-    """Turntable origin in camera frame as the fixed point of the disk rotation.
-
-    For a turntable-fixed point the board origin satisfies
-        (R_ij - I) c = (R_ij - I) t_i - (t_j - t_i)
-    where R_ij is the relative rotation between frames i and j. Stacking many
-    pairs and solving in least squares gives the rotation centre. The component
-    along the axis is unconstrained, so it is pinned to the mean projection.
-    """
+    # Estimate the fixed rotation center from board poses
     a_blocks = []
     b_blocks = []
     count = len(rotations)
@@ -124,6 +114,7 @@ def solve_rotation_center_camera(rotations, translations, axis_camera, stride=5,
 
 
 def rotation_about_axis(axis, theta):
+    # Build a rotation matrix for rotating by theta radians about the given axis
     axis = axis / np.linalg.norm(axis)
     cross = np.array([[0.0, -axis[2], axis[1]],
                       [axis[2], 0.0, -axis[0]],
@@ -132,16 +123,7 @@ def rotation_about_axis(axis, theta):
 
 
 def solve_rotation_center_corners(rotations, translations, board, axis_camera):
-    """Turntable origin in camera frame from every board corner, not just the
-    origin. Each corner, after unrotating its frame angle about the disk axis,
-    must map to a constant point. This uses thousands of constraints and is far
-    less sensitive to the anisotropic depth noise of a single board pose.
-
-    Tangential (image-plane) accuracy is excellent; the residual error sits
-    along the camera viewing direction, i.e. it is a harmless global scale that
-    is shared with the laser plane (calibrated from the same board) and removed
-    by the metric alignment.
-    """
+    # Given the board poses, find the point in camera coordinates that is fixed by all the rotations. 
     object_corners = board.getChessboardCorners().astype(np.float64)  # (M, 3)
     reference = rotations[0]
     angles = []
@@ -176,6 +158,7 @@ def solve_rotation_center_corners(rotations, translations, board, axis_camera):
 
 
 def detect_board_poses(image_paths, board, camera_matrix, dist_coeffs, min_corners):
+    # Detect the ChArUco board
     detector = cv2.aruco.CharucoDetector(board)
     board_corners = board.getChessboardCorners()
     records = []
@@ -221,16 +204,19 @@ def detect_board_poses(image_paths, board, camera_matrix, dist_coeffs, min_corne
 
 
 def camera_to_world_point(point_camera, camera_cfg):
+    # Transform camera coordinates point to world coordinates point
     rotation_world_to_camera, translation_world_to_camera = build_extrinsics(camera_cfg)
     return rotation_world_to_camera.T @ (point_camera - translation_world_to_camera)
 
 
 def camera_to_world_vector(vector_camera, camera_cfg):
+    # Transform camera coordinates vector to world coordinates vector (translation doesn't matter)
     rotation_world_to_camera, _ = build_extrinsics(camera_cfg)
     return rotation_world_to_camera.T @ vector_camera
 
 
 def build_turntable_frame_camera(center_camera, axis_camera, translations):
+    # Build a camera-to-world rotation matrix that aligns the world Z axis to the turntable axis, and the world origin to the turntable center.
     z_axis = axis_camera / np.linalg.norm(axis_camera)
     x_axis = translations[0] - center_camera
     x_axis -= z_axis * float(x_axis @ z_axis)
@@ -244,6 +230,7 @@ def build_turntable_frame_camera(center_camera, axis_camera, translations):
 
 
 def config_camera_pose(camera_cfg):
+    # Given camera exstrincs, report its location in world coordinates 
     rotation_world_to_camera, translation_world_to_camera = build_extrinsics(camera_cfg)
     location = -rotation_world_to_camera.T @ translation_world_to_camera
     return {
@@ -254,6 +241,7 @@ def config_camera_pose(camera_cfg):
 
 
 def calibrate_camera(root_config, max_frames=90, min_corners=12):
+    # Main function
     dataset_name = root_config["active"]
     config = root_config[dataset_name]
     calibration_cfg = config["calibration"]

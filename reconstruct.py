@@ -256,14 +256,6 @@ def sample_mesh(path, sample_count):
 
 
 def align_by_centroid_scale(source, target):
-    """Coarse alignment by centroid + RMS-radius (isotropic) scale.
-
-    Unlike a bounding-box-diagonal match, the RMS radius about the centroid is
-    not dominated by a single extreme extent, so it stays well-behaved when the
-    reconstruction only covers a partial cap of the object. This only provides a
-    seed; the final scale is estimated jointly by scaling-ICP from the actually
-    overlapping points.
-    """
     source_points = np.asarray(source.points)
     target_points = np.asarray(target.points)
     source_center = source_points.mean(axis=0)
@@ -283,18 +275,6 @@ align_by_bbox = align_by_centroid_scale
 
 
 def align_by_icp(source, target):
-    """Refine a coarse alignment with scaling-ICP.
-
-    The reconstruction lives in the estimated turntable frame, whose azimuth
-    (and handedness of the disk basis) is arbitrary relative to the ground-truth
-    mesh, and the estimated calibration only fixes scale up to a global gauge.
-    A coarse centroid/RMS match fixes translation and a rough scale but not the
-    rotation, so ICP is needed for a meaningful Chamfer distance. Scaling is
-    enabled so the final scale is estimated from the corresponding (overlapping)
-    points only, which is what makes the metric reflect true shape error rather
-    than a bounding-box artifact when coverage is partial. Several yaw seeds are
-    tried to avoid ICP settling in a wrong local minimum.
-    """
     target_extent = float(np.linalg.norm(target.get_axis_aligned_bounding_box().get_extent()))
     threshold = max(target_extent * 0.2, 1e-3)
     center = source.get_center()

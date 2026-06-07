@@ -35,10 +35,6 @@ def detect_board_pose(image_gray, board, camera_matrix):
     object_points = board.getChessboardCorners()[charuco_ids.ravel()].astype(np.float32)
     image_points = charuco_corners.reshape(-1, 2).astype(np.float32)
 
-    # The laser stripe corrupts the ChArUco corners it crosses, so a plain
-    # solvePnP over every corner is dragged off by those outliers. RANSAC keeps
-    # only the corners consistent with a single rigid pose, then we refine on
-    # that inlier set.
     ok, rotation_vec, translation_vec, inliers = cv2.solvePnPRansac(
         object_points,
         image_points,
