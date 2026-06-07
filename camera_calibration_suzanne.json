@@ -1,0 +1,1815 @@
+{
+  "dataset": "suzanne",
+  "intrinsics_source": "config",
+  "camera_matrix": [
+    [
+      1120.0,
+      0.0,
+      512.0
+    ],
+    [
+      0.0,
+      1120.0,
+      512.0
+    ],
+    [
+      0.0,
+      0.0,
+      1.0
+    ]
+  ],
+  "dist_coeffs": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+  ],
+  "image_size": [
+    1024,
+    1024
+  ],
+  "frames_total": 360,
+  "frames_sampled": 360,
+  "poses_used": 338,
+  "poses_used_for_axis": 338,
+  "frames_used": 338,
+  "rms_reprojection": 0.3973762094974518,
+  "mean_reprojection": 0.29047849774360657,
+  "p95_reprojection": 0.8698599338531494,
+  "disk_radius_camera": 1.313402034083229,
+  "disk_circle_residual_mean": 0.021406181492882172,
+  "disk_circle_residual_p95": 0.043031039250634985,
+  "disk_axis_spread_deg": 0.1978488636172364,
+  "disk_center_camera": [
+    -0.0009305783286592444,
+    0.5075941423543417,
+    6.833528507480778
+  ],
+  "disk_axis_camera": [
+    0.0010995965834701708,
+    -0.9058437821143156,
+    -0.4236104735392954
+  ],
+  "disk_center_world": [
+    -2.8629790606307738e-11,
+    -2.920825752393849e-12,
+    4.947035520302911e-11
+  ],
+  "disk_axis_world": [
+    2.3805860061714806e-11,
+    9.057643524369942e-12,
+    1.0
+  ],
+  "estimated_extrinsics": {
+    "frame": "turntable_from_fitted_board_trajectory",
+    "world_to_camera_rotation": [
+      [
+        0.9857938123571324,
+        0.16795639435801293,
+        0.0010995965834701708
+      ],
+      [
+        0.07213008743530434,
+        -0.41742579327517343,
+        -0.9058437821143156
+      ],
+      [
+        -0.15168325551940817,
+        0.8930545093681841,
+        -0.4236104735392954
+      ]
+    ],
+    "world_to_camera_translation": [
+      -0.0009305783286592444,
+      0.5075941423543417,
+      6.833528507480778
+    ],
+    "camera_location_world": [
+      1.0008363991880058,
+      -5.890674264386904,
+      3.3545562679482868
+    ]
+  },
+  "config_extrinsics": {
+    "world_to_camera_rotation": [
+      [
+        0.9857938124,
+        0.1679563944,
+        0.0010995966
+      ],
+      [
+        0.0721300874,
+        -0.4174257933,
+        -0.9058437821
+      ],
+      [
+        -0.1516832555,
+        0.8930545094,
+        -0.4236104735
+      ]
+    ],
+    "world_to_camera_translation": [
+      -0.0009305783,
+      0.5075941424,
+      6.8335285075
+    ],
+    "camera_location_world": [
+      1.0008363990447098,
+      -5.8906742645945975,
+      3.3545562677219793
+    ]
+  },
+  "images": [
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0001.png",
+      "charuco_corners": 58,
+      "mean_reprojection": 0.34788933396339417
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0002.png",
+      "charuco_corners": 59,
+      "mean_reprojection": 0.34677383303642273
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0003.png",
+      "charuco_corners": 53,
+      "mean_reprojection": 0.3594209849834442
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0004.png",
+      "charuco_corners": 70,
+      "mean_reprojection": 0.36203914880752563
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0005.png",
+      "charuco_corners": 61,
+      "mean_reprojection": 0.35958749055862427
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0006.png",
+      "charuco_corners": 58,
+      "mean_reprojection": 0.37022078037261963
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0007.png",
+      "charuco_corners": 52,
+      "mean_reprojection": 0.36027976870536804
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0008.png",
+      "charuco_corners": 59,
+      "mean_reprojection": 0.44462400674819946
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0009.png",
+      "charuco_corners": 57,
+      "mean_reprojection": 0.4069812595844269
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0010.png",
+      "charuco_corners": 63,
+      "mean_reprojection": 0.4121248722076416
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0011.png",
+      "charuco_corners": 63,
+      "mean_reprojection": 0.44040706753730774
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0012.png",
+      "charuco_corners": 65,
+      "mean_reprojection": 0.42109012603759766
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0013.png",
+      "charuco_corners": 56,
+      "mean_reprojection": 0.42965057492256165
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0014.png",
+      "charuco_corners": 64,
+      "mean_reprojection": 0.4254997670650482
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0015.png",
+      "charuco_corners": 56,
+      "mean_reprojection": 0.4099813997745514
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0016.png",
+      "charuco_corners": 53,
+      "mean_reprojection": 0.3754349946975708
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0017.png",
+      "charuco_corners": 65,
+      "mean_reprojection": 0.40643036365509033
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0018.png",
+      "charuco_corners": 56,
+      "mean_reprojection": 0.4243495464324951
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0019.png",
+      "charuco_corners": 51,
+      "mean_reprojection": 0.35940021276474
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0020.png",
+      "charuco_corners": 60,
+      "mean_reprojection": 0.5241652727127075
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0021.png",
+      "charuco_corners": 55,
+      "mean_reprojection": 0.4874643385410309
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0022.png",
+      "charuco_corners": 58,
+      "mean_reprojection": 0.3720448613166809
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0023.png",
+      "charuco_corners": 55,
+      "mean_reprojection": 0.42081010341644287
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0024.png",
+      "charuco_corners": 60,
+      "mean_reprojection": 0.41457870602607727
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0025.png",
+      "charuco_corners": 56,
+      "mean_reprojection": 0.4067137539386749
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0026.png",
+      "charuco_corners": 50,
+      "mean_reprojection": 0.38652732968330383
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0027.png",
+      "charuco_corners": 58,
+      "mean_reprojection": 0.3848159909248352
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0028.png",
+      "charuco_corners": 56,
+      "mean_reprojection": 0.35139164328575134
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0029.png",
+      "charuco_corners": 51,
+      "mean_reprojection": 0.3398221731185913
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0030.png",
+      "charuco_corners": 55,
+      "mean_reprojection": 0.3789718747138977
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0031.png",
+      "charuco_corners": 57,
+      "mean_reprojection": 0.33347684144973755
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0032.png",
+      "charuco_corners": 59,
+      "mean_reprojection": 0.40499207377433777
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0033.png",
+      "charuco_corners": 57,
+      "mean_reprojection": 0.34433647990226746
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0034.png",
+      "charuco_corners": 55,
+      "mean_reprojection": 0.3841278553009033
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0035.png",
+      "charuco_corners": 53,
+      "mean_reprojection": 0.30903831124305725
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0036.png",
+      "charuco_corners": 50,
+      "mean_reprojection": 0.25055480003356934
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0037.png",
+      "charuco_corners": 51,
+      "mean_reprojection": 0.2369048297405243
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0038.png",
+      "charuco_corners": 58,
+      "mean_reprojection": 0.3173938989639282
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0039.png",
+      "charuco_corners": 56,
+      "mean_reprojection": 0.24480204284191132
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0040.png",
+      "charuco_corners": 51,
+      "mean_reprojection": 0.23591171205043793
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0041.png",
+      "charuco_corners": 51,
+      "mean_reprojection": 0.19404219090938568
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0042.png",
+      "charuco_corners": 56,
+      "mean_reprojection": 0.2087007462978363
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0043.png",
+      "charuco_corners": 46,
+      "mean_reprojection": 0.18278540670871735
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0044.png",
+      "charuco_corners": 45,
+      "mean_reprojection": 0.14200899004936218
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0045.png",
+      "charuco_corners": 45,
+      "mean_reprojection": 0.14252693951129913
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0046.png",
+      "charuco_corners": 57,
+      "mean_reprojection": 0.143638014793396
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0047.png",
+      "charuco_corners": 48,
+      "mean_reprojection": 0.19573409855365753
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0048.png",
+      "charuco_corners": 55,
+      "mean_reprojection": 0.14887182414531708
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0049.png",
+      "charuco_corners": 49,
+      "mean_reprojection": 0.13842003047466278
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0050.png",
+      "charuco_corners": 35,
+      "mean_reprojection": 0.13776403665542603
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0051.png",
+      "charuco_corners": 39,
+      "mean_reprojection": 0.12874221801757812
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0052.png",
+      "charuco_corners": 49,
+      "mean_reprojection": 0.1519688069820404
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0053.png",
+      "charuco_corners": 50,
+      "mean_reprojection": 0.1264747679233551
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0054.png",
+      "charuco_corners": 42,
+      "mean_reprojection": 0.11581425368785858
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0055.png",
+      "charuco_corners": 46,
+      "mean_reprojection": 0.11998158693313599
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0056.png",
+      "charuco_corners": 39,
+      "mean_reprojection": 0.10491655766963959
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0057.png",
+      "charuco_corners": 44,
+      "mean_reprojection": 0.12880463898181915
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0058.png",
+      "charuco_corners": 35,
+      "mean_reprojection": 0.14059042930603027
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0059.png",
+      "charuco_corners": 40,
+      "mean_reprojection": 0.10587465763092041
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0060.png",
+      "charuco_corners": 37,
+      "mean_reprojection": 0.09305528551340103
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0061.png",
+      "charuco_corners": 41,
+      "mean_reprojection": 0.13562127947807312
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0062.png",
+      "charuco_corners": 42,
+      "mean_reprojection": 0.1082894429564476
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0064.png",
+      "charuco_corners": 45,
+      "mean_reprojection": 0.14070358872413635
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0065.png",
+      "charuco_corners": 48,
+      "mean_reprojection": 0.12120410799980164
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0066.png",
+      "charuco_corners": 47,
+      "mean_reprojection": 0.14787344634532928
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0067.png",
+      "charuco_corners": 44,
+      "mean_reprojection": 0.13140888512134552
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0068.png",
+      "charuco_corners": 40,
+      "mean_reprojection": 0.11641111224889755
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0070.png",
+      "charuco_corners": 42,
+      "mean_reprojection": 0.13046656548976898
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0071.png",
+      "charuco_corners": 47,
+      "mean_reprojection": 0.1171845868229866
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0072.png",
+      "charuco_corners": 35,
+      "mean_reprojection": 0.13277184963226318
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0074.png",
+      "charuco_corners": 36,
+      "mean_reprojection": 0.1314544826745987
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0075.png",
+      "charuco_corners": 37,
+      "mean_reprojection": 0.10168903321027756
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0076.png",
+      "charuco_corners": 44,
+      "mean_reprojection": 0.12239852547645569
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0077.png",
+      "charuco_corners": 43,
+      "mean_reprojection": 0.18512295186519623
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0078.png",
+      "charuco_corners": 43,
+      "mean_reprojection": 0.1251695305109024
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0079.png",
+      "charuco_corners": 43,
+      "mean_reprojection": 0.1562698632478714
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0080.png",
+      "charuco_corners": 38,
+      "mean_reprojection": 0.195443794131279
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0081.png",
+      "charuco_corners": 42,
+      "mean_reprojection": 0.12679436802864075
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0082.png",
+      "charuco_corners": 48,
+      "mean_reprojection": 0.18309320509433746
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0083.png",
+      "charuco_corners": 41,
+      "mean_reprojection": 0.18675823509693146
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0084.png",
+      "charuco_corners": 49,
+      "mean_reprojection": 0.19005197286605835
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0085.png",
+      "charuco_corners": 43,
+      "mean_reprojection": 0.24558526277542114
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0086.png",
+      "charuco_corners": 49,
+      "mean_reprojection": 0.2602759599685669
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0087.png",
+      "charuco_corners": 46,
+      "mean_reprojection": 0.23740163445472717
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0088.png",
+      "charuco_corners": 53,
+      "mean_reprojection": 0.273440420627594
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0089.png",
+      "charuco_corners": 55,
+      "mean_reprojection": 0.2757386863231659
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0090.png",
+      "charuco_corners": 59,
+      "mean_reprojection": 0.3307642638683319
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0091.png",
+      "charuco_corners": 54,
+      "mean_reprojection": 0.3400000333786011
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0092.png",
+      "charuco_corners": 54,
+      "mean_reprojection": 0.33428463339805603
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0093.png",
+      "charuco_corners": 56,
+      "mean_reprojection": 0.36861738562583923
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0094.png",
+      "charuco_corners": 53,
+      "mean_reprojection": 0.3661467134952545
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0095.png",
+      "charuco_corners": 46,
+      "mean_reprojection": 0.4119284152984619
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0096.png",
+      "charuco_corners": 51,
+      "mean_reprojection": 0.3842930495738983
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0097.png",
+      "charuco_corners": 59,
+      "mean_reprojection": 0.4078502357006073
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0098.png",
+      "charuco_corners": 51,
+      "mean_reprojection": 0.42692482471466064
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0099.png",
+      "charuco_corners": 58,
+      "mean_reprojection": 0.4344390630722046
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0100.png",
+      "charuco_corners": 58,
+      "mean_reprojection": 0.3944621980190277
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0101.png",
+      "charuco_corners": 54,
+      "mean_reprojection": 0.3856904208660126
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0102.png",
+      "charuco_corners": 44,
+      "mean_reprojection": 0.371127724647522
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0103.png",
+      "charuco_corners": 48,
+      "mean_reprojection": 0.38283050060272217
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0104.png",
+      "charuco_corners": 53,
+      "mean_reprojection": 0.4117884337902069
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0105.png",
+      "charuco_corners": 44,
+      "mean_reprojection": 0.3624241352081299
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0106.png",
+      "charuco_corners": 52,
+      "mean_reprojection": 0.40455949306488037
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0107.png",
+      "charuco_corners": 56,
+      "mean_reprojection": 0.4521668255329132
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0108.png",
+      "charuco_corners": 54,
+      "mean_reprojection": 0.46250274777412415
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0109.png",
+      "charuco_corners": 58,
+      "mean_reprojection": 0.42800870537757874
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0110.png",
+      "charuco_corners": 42,
+      "mean_reprojection": 0.41899222135543823
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0111.png",
+      "charuco_corners": 47,
+      "mean_reprojection": 0.41892579197883606
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0112.png",
+      "charuco_corners": 45,
+      "mean_reprojection": 0.4304608702659607
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0113.png",
+      "charuco_corners": 62,
+      "mean_reprojection": 0.4484820067882538
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0114.png",
+      "charuco_corners": 63,
+      "mean_reprojection": 0.46759727597236633
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0115.png",
+      "charuco_corners": 48,
+      "mean_reprojection": 0.4025947153568268
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0116.png",
+      "charuco_corners": 45,
+      "mean_reprojection": 0.30290624499320984
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0117.png",
+      "charuco_corners": 47,
+      "mean_reprojection": 0.41657426953315735
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0118.png",
+      "charuco_corners": 54,
+      "mean_reprojection": 0.42052721977233887
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0119.png",
+      "charuco_corners": 50,
+      "mean_reprojection": 0.42582759261131287
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0120.png",
+      "charuco_corners": 50,
+      "mean_reprojection": 0.37802964448928833
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0121.png",
+      "charuco_corners": 50,
+      "mean_reprojection": 0.3668902516365051
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0122.png",
+      "charuco_corners": 55,
+      "mean_reprojection": 0.3400270938873291
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0123.png",
+      "charuco_corners": 60,
+      "mean_reprojection": 0.3542793095111847
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0124.png",
+      "charuco_corners": 51,
+      "mean_reprojection": 0.36827629804611206
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0125.png",
+      "charuco_corners": 56,
+      "mean_reprojection": 0.353675901889801
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0126.png",
+      "charuco_corners": 55,
+      "mean_reprojection": 0.40208691358566284
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0127.png",
+      "charuco_corners": 50,
+      "mean_reprojection": 0.3346256911754608
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0128.png",
+      "charuco_corners": 55,
+      "mean_reprojection": 0.257632851600647
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0129.png",
+      "charuco_corners": 59,
+      "mean_reprojection": 0.25743567943573
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0130.png",
+      "charuco_corners": 56,
+      "mean_reprojection": 0.28219079971313477
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0131.png",
+      "charuco_corners": 42,
+      "mean_reprojection": 0.24410636723041534
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0132.png",
+      "charuco_corners": 53,
+      "mean_reprojection": 0.3179877996444702
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0133.png",
+      "charuco_corners": 53,
+      "mean_reprojection": 0.2205033153295517
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0134.png",
+      "charuco_corners": 59,
+      "mean_reprojection": 0.22588595747947693
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0135.png",
+      "charuco_corners": 46,
+      "mean_reprojection": 0.16014441847801208
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0136.png",
+      "charuco_corners": 42,
+      "mean_reprojection": 0.19631394743919373
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0137.png",
+      "charuco_corners": 49,
+      "mean_reprojection": 0.1490420550107956
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0138.png",
+      "charuco_corners": 48,
+      "mean_reprojection": 0.12535588443279266
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0139.png",
+      "charuco_corners": 37,
+      "mean_reprojection": 0.1551775187253952
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0140.png",
+      "charuco_corners": 48,
+      "mean_reprojection": 0.1939893215894699
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0141.png",
+      "charuco_corners": 39,
+      "mean_reprojection": 0.1356617957353592
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0142.png",
+      "charuco_corners": 43,
+      "mean_reprojection": 0.13522003591060638
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0143.png",
+      "charuco_corners": 42,
+      "mean_reprojection": 0.15720951557159424
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0147.png",
+      "charuco_corners": 41,
+      "mean_reprojection": 0.11673947423696518
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0148.png",
+      "charuco_corners": 39,
+      "mean_reprojection": 0.13031814992427826
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0149.png",
+      "charuco_corners": 49,
+      "mean_reprojection": 0.1199980154633522
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0150.png",
+      "charuco_corners": 35,
+      "mean_reprojection": 0.11687403917312622
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0151.png",
+      "charuco_corners": 48,
+      "mean_reprojection": 0.1015830859541893
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0152.png",
+      "charuco_corners": 46,
+      "mean_reprojection": 0.13595086336135864
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0153.png",
+      "charuco_corners": 47,
+      "mean_reprojection": 0.1356482356786728
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0154.png",
+      "charuco_corners": 42,
+      "mean_reprojection": 0.12793713808059692
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0156.png",
+      "charuco_corners": 41,
+      "mean_reprojection": 0.11083762347698212
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0157.png",
+      "charuco_corners": 38,
+      "mean_reprojection": 0.11557432264089584
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0160.png",
+      "charuco_corners": 40,
+      "mean_reprojection": 0.10373000800609589
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0161.png",
+      "charuco_corners": 47,
+      "mean_reprojection": 0.1212242990732193
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0163.png",
+      "charuco_corners": 38,
+      "mean_reprojection": 0.10708539187908173
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0164.png",
+      "charuco_corners": 52,
+      "mean_reprojection": 0.17404048144817352
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0165.png",
+      "charuco_corners": 52,
+      "mean_reprojection": 0.11233992129564285
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0166.png",
+      "charuco_corners": 40,
+      "mean_reprojection": 0.20380015671253204
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0167.png",
+      "charuco_corners": 52,
+      "mean_reprojection": 0.20684774219989777
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0168.png",
+      "charuco_corners": 56,
+      "mean_reprojection": 0.2628632187843323
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0169.png",
+      "charuco_corners": 48,
+      "mean_reprojection": 0.23754216730594635
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0170.png",
+      "charuco_corners": 57,
+      "mean_reprojection": 0.23386918008327484
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0171.png",
+      "charuco_corners": 49,
+      "mean_reprojection": 0.2271493822336197
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0172.png",
+      "charuco_corners": 52,
+      "mean_reprojection": 0.2340410351753235
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0173.png",
+      "charuco_corners": 42,
+      "mean_reprojection": 0.28303956985473633
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0174.png",
+      "charuco_corners": 45,
+      "mean_reprojection": 0.26406049728393555
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0175.png",
+      "charuco_corners": 51,
+      "mean_reprojection": 0.32281404733657837
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0176.png",
+      "charuco_corners": 52,
+      "mean_reprojection": 0.31764745712280273
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0177.png",
+      "charuco_corners": 55,
+      "mean_reprojection": 0.3276779055595398
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0178.png",
+      "charuco_corners": 49,
+      "mean_reprojection": 0.3082010746002197
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0179.png",
+      "charuco_corners": 62,
+      "mean_reprojection": 0.3127043545246124
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0180.png",
+      "charuco_corners": 60,
+      "mean_reprojection": 0.35854053497314453
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0181.png",
+      "charuco_corners": 50,
+      "mean_reprojection": 0.3594992458820343
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0182.png",
+      "charuco_corners": 55,
+      "mean_reprojection": 0.3714332580566406
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0183.png",
+      "charuco_corners": 56,
+      "mean_reprojection": 0.3818149268627167
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0184.png",
+      "charuco_corners": 56,
+      "mean_reprojection": 0.36429986357688904
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0185.png",
+      "charuco_corners": 44,
+      "mean_reprojection": 0.3988899886608124
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0186.png",
+      "charuco_corners": 59,
+      "mean_reprojection": 0.4082184433937073
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0187.png",
+      "charuco_corners": 57,
+      "mean_reprojection": 0.3820508122444153
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0188.png",
+      "charuco_corners": 57,
+      "mean_reprojection": 0.43249082565307617
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0189.png",
+      "charuco_corners": 54,
+      "mean_reprojection": 0.43209803104400635
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0190.png",
+      "charuco_corners": 57,
+      "mean_reprojection": 0.5052077174186707
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0191.png",
+      "charuco_corners": 47,
+      "mean_reprojection": 0.4755353331565857
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0192.png",
+      "charuco_corners": 48,
+      "mean_reprojection": 0.464597225189209
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0193.png",
+      "charuco_corners": 58,
+      "mean_reprojection": 0.4508505165576935
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0194.png",
+      "charuco_corners": 57,
+      "mean_reprojection": 0.47382569313049316
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0195.png",
+      "charuco_corners": 48,
+      "mean_reprojection": 0.5198689103126526
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0196.png",
+      "charuco_corners": 42,
+      "mean_reprojection": 0.42191219329833984
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0197.png",
+      "charuco_corners": 61,
+      "mean_reprojection": 0.5064607858657837
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0198.png",
+      "charuco_corners": 55,
+      "mean_reprojection": 0.4571113586425781
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0199.png",
+      "charuco_corners": 51,
+      "mean_reprojection": 0.4826015532016754
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0200.png",
+      "charuco_corners": 59,
+      "mean_reprojection": 0.4314962923526764
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0201.png",
+      "charuco_corners": 51,
+      "mean_reprojection": 0.5495632886886597
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0202.png",
+      "charuco_corners": 49,
+      "mean_reprojection": 0.4368443787097931
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0203.png",
+      "charuco_corners": 57,
+      "mean_reprojection": 0.4919147789478302
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0204.png",
+      "charuco_corners": 49,
+      "mean_reprojection": 0.384238064289093
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0205.png",
+      "charuco_corners": 46,
+      "mean_reprojection": 0.527998685836792
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0206.png",
+      "charuco_corners": 58,
+      "mean_reprojection": 0.4570262134075165
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0207.png",
+      "charuco_corners": 51,
+      "mean_reprojection": 0.42457494139671326
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0208.png",
+      "charuco_corners": 56,
+      "mean_reprojection": 0.41137218475341797
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0209.png",
+      "charuco_corners": 46,
+      "mean_reprojection": 0.4456080198287964
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0210.png",
+      "charuco_corners": 52,
+      "mean_reprojection": 0.40634578466415405
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0211.png",
+      "charuco_corners": 62,
+      "mean_reprojection": 0.41813337802886963
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0212.png",
+      "charuco_corners": 48,
+      "mean_reprojection": 0.4077882468700409
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0213.png",
+      "charuco_corners": 56,
+      "mean_reprojection": 0.3684101402759552
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0214.png",
+      "charuco_corners": 50,
+      "mean_reprojection": 0.3266250491142273
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0215.png",
+      "charuco_corners": 49,
+      "mean_reprojection": 0.3202911615371704
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0216.png",
+      "charuco_corners": 50,
+      "mean_reprojection": 0.3556666970252991
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0217.png",
+      "charuco_corners": 44,
+      "mean_reprojection": 0.2929404079914093
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0218.png",
+      "charuco_corners": 48,
+      "mean_reprojection": 0.32975876331329346
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0219.png",
+      "charuco_corners": 51,
+      "mean_reprojection": 0.2957516312599182
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0220.png",
+      "charuco_corners": 48,
+      "mean_reprojection": 0.24488680064678192
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0221.png",
+      "charuco_corners": 42,
+      "mean_reprojection": 0.2316458821296692
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0222.png",
+      "charuco_corners": 43,
+      "mean_reprojection": 0.255214124917984
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0223.png",
+      "charuco_corners": 52,
+      "mean_reprojection": 0.23986898362636566
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0224.png",
+      "charuco_corners": 48,
+      "mean_reprojection": 0.15511327981948853
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0225.png",
+      "charuco_corners": 46,
+      "mean_reprojection": 0.19981811940670013
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0226.png",
+      "charuco_corners": 52,
+      "mean_reprojection": 0.20589841902256012
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0227.png",
+      "charuco_corners": 46,
+      "mean_reprojection": 0.22096481919288635
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0228.png",
+      "charuco_corners": 41,
+      "mean_reprojection": 0.14495882391929626
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0229.png",
+      "charuco_corners": 40,
+      "mean_reprojection": 0.13510297238826752
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0230.png",
+      "charuco_corners": 38,
+      "mean_reprojection": 0.1891949325799942
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0231.png",
+      "charuco_corners": 40,
+      "mean_reprojection": 0.0882088914513588
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0234.png",
+      "charuco_corners": 41,
+      "mean_reprojection": 0.13410888612270355
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0235.png",
+      "charuco_corners": 43,
+      "mean_reprojection": 0.1181802973151207
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0237.png",
+      "charuco_corners": 36,
+      "mean_reprojection": 0.1187351793050766
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0238.png",
+      "charuco_corners": 38,
+      "mean_reprojection": 0.12917779386043549
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0240.png",
+      "charuco_corners": 45,
+      "mean_reprojection": 0.13953836262226105
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0242.png",
+      "charuco_corners": 37,
+      "mean_reprojection": 0.12059541791677475
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0244.png",
+      "charuco_corners": 41,
+      "mean_reprojection": 0.1226329356431961
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0245.png",
+      "charuco_corners": 39,
+      "mean_reprojection": 0.10423320531845093
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0249.png",
+      "charuco_corners": 38,
+      "mean_reprojection": 0.13343341648578644
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0250.png",
+      "charuco_corners": 41,
+      "mean_reprojection": 0.13315176963806152
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0251.png",
+      "charuco_corners": 45,
+      "mean_reprojection": 0.12432236969470978
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0252.png",
+      "charuco_corners": 48,
+      "mean_reprojection": 0.12602370977401733
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0253.png",
+      "charuco_corners": 39,
+      "mean_reprojection": 0.16922466456890106
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0254.png",
+      "charuco_corners": 40,
+      "mean_reprojection": 0.1576330065727234
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0256.png",
+      "charuco_corners": 39,
+      "mean_reprojection": 0.15311183035373688
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0258.png",
+      "charuco_corners": 46,
+      "mean_reprojection": 0.21107907593250275
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0259.png",
+      "charuco_corners": 38,
+      "mean_reprojection": 0.12532077729701996
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0260.png",
+      "charuco_corners": 41,
+      "mean_reprojection": 0.16791515052318573
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0261.png",
+      "charuco_corners": 40,
+      "mean_reprojection": 0.21037347614765167
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0262.png",
+      "charuco_corners": 48,
+      "mean_reprojection": 0.22942228615283966
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0263.png",
+      "charuco_corners": 49,
+      "mean_reprojection": 0.296673059463501
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0264.png",
+      "charuco_corners": 50,
+      "mean_reprojection": 0.24631164968013763
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0265.png",
+      "charuco_corners": 61,
+      "mean_reprojection": 0.244947612285614
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0266.png",
+      "charuco_corners": 45,
+      "mean_reprojection": 0.24054834246635437
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0267.png",
+      "charuco_corners": 42,
+      "mean_reprojection": 0.25225934386253357
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0268.png",
+      "charuco_corners": 48,
+      "mean_reprojection": 0.3065080940723419
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0269.png",
+      "charuco_corners": 52,
+      "mean_reprojection": 0.29076358675956726
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0270.png",
+      "charuco_corners": 44,
+      "mean_reprojection": 0.2821248173713684
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0271.png",
+      "charuco_corners": 53,
+      "mean_reprojection": 0.2967081367969513
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0272.png",
+      "charuco_corners": 49,
+      "mean_reprojection": 0.32163795828819275
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0273.png",
+      "charuco_corners": 50,
+      "mean_reprojection": 0.327682226896286
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0274.png",
+      "charuco_corners": 45,
+      "mean_reprojection": 0.3381984829902649
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0275.png",
+      "charuco_corners": 49,
+      "mean_reprojection": 0.4063703119754791
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0276.png",
+      "charuco_corners": 54,
+      "mean_reprojection": 0.3414931893348694
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0277.png",
+      "charuco_corners": 47,
+      "mean_reprojection": 0.3845776617527008
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0278.png",
+      "charuco_corners": 48,
+      "mean_reprojection": 0.37820014357566833
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0279.png",
+      "charuco_corners": 52,
+      "mean_reprojection": 0.3855721056461334
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0280.png",
+      "charuco_corners": 50,
+      "mean_reprojection": 0.3852604031562805
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0281.png",
+      "charuco_corners": 56,
+      "mean_reprojection": 0.4446161687374115
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0282.png",
+      "charuco_corners": 58,
+      "mean_reprojection": 0.4565977454185486
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0283.png",
+      "charuco_corners": 55,
+      "mean_reprojection": 0.4324587285518646
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0284.png",
+      "charuco_corners": 52,
+      "mean_reprojection": 0.4503879249095917
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0285.png",
+      "charuco_corners": 48,
+      "mean_reprojection": 0.41966214776039124
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0286.png",
+      "charuco_corners": 47,
+      "mean_reprojection": 0.4255400598049164
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0287.png",
+      "charuco_corners": 52,
+      "mean_reprojection": 0.3871190845966339
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0288.png",
+      "charuco_corners": 68,
+      "mean_reprojection": 0.46811312437057495
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0289.png",
+      "charuco_corners": 52,
+      "mean_reprojection": 0.5676925182342529
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0290.png",
+      "charuco_corners": 47,
+      "mean_reprojection": 0.4268663823604584
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0291.png",
+      "charuco_corners": 54,
+      "mean_reprojection": 0.3969880938529968
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0292.png",
+      "charuco_corners": 57,
+      "mean_reprojection": 0.4346899092197418
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0293.png",
+      "charuco_corners": 57,
+      "mean_reprojection": 0.44306695461273193
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0294.png",
+      "charuco_corners": 46,
+      "mean_reprojection": 0.4176097810268402
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0295.png",
+      "charuco_corners": 54,
+      "mean_reprojection": 0.4240860641002655
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0296.png",
+      "charuco_corners": 49,
+      "mean_reprojection": 0.37130799889564514
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0297.png",
+      "charuco_corners": 51,
+      "mean_reprojection": 0.36461564898490906
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0298.png",
+      "charuco_corners": 62,
+      "mean_reprojection": 0.38945794105529785
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0299.png",
+      "charuco_corners": 53,
+      "mean_reprojection": 0.4303608536720276
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0300.png",
+      "charuco_corners": 51,
+      "mean_reprojection": 0.3711431622505188
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0301.png",
+      "charuco_corners": 61,
+      "mean_reprojection": 0.3892616927623749
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0302.png",
+      "charuco_corners": 64,
+      "mean_reprojection": 0.38265344500541687
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0303.png",
+      "charuco_corners": 59,
+      "mean_reprojection": 0.40389707684516907
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0304.png",
+      "charuco_corners": 56,
+      "mean_reprojection": 0.370298832654953
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0305.png",
+      "charuco_corners": 58,
+      "mean_reprojection": 0.32744520902633667
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0306.png",
+      "charuco_corners": 51,
+      "mean_reprojection": 0.355995774269104
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0307.png",
+      "charuco_corners": 54,
+      "mean_reprojection": 0.32850131392478943
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0308.png",
+      "charuco_corners": 62,
+      "mean_reprojection": 0.3375609815120697
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0309.png",
+      "charuco_corners": 59,
+      "mean_reprojection": 0.32958748936653137
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0310.png",
+      "charuco_corners": 59,
+      "mean_reprojection": 0.31525108218193054
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0311.png",
+      "charuco_corners": 51,
+      "mean_reprojection": 0.2661249041557312
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0312.png",
+      "charuco_corners": 56,
+      "mean_reprojection": 0.3266972601413727
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0313.png",
+      "charuco_corners": 59,
+      "mean_reprojection": 0.187000572681427
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0314.png",
+      "charuco_corners": 50,
+      "mean_reprojection": 0.1808728277683258
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0315.png",
+      "charuco_corners": 52,
+      "mean_reprojection": 0.2690320909023285
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0316.png",
+      "charuco_corners": 56,
+      "mean_reprojection": 0.19919398427009583
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0317.png",
+      "charuco_corners": 47,
+      "mean_reprojection": 0.22780200839042664
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0318.png",
+      "charuco_corners": 62,
+      "mean_reprojection": 0.19852563738822937
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0319.png",
+      "charuco_corners": 64,
+      "mean_reprojection": 0.18257561326026917
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0320.png",
+      "charuco_corners": 55,
+      "mean_reprojection": 0.2031833827495575
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0321.png",
+      "charuco_corners": 44,
+      "mean_reprojection": 0.173699751496315
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0322.png",
+      "charuco_corners": 52,
+      "mean_reprojection": 0.1275789886713028
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0323.png",
+      "charuco_corners": 53,
+      "mean_reprojection": 0.12617702782154083
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0324.png",
+      "charuco_corners": 55,
+      "mean_reprojection": 0.13303658366203308
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0325.png",
+      "charuco_corners": 41,
+      "mean_reprojection": 0.14713117480278015
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0326.png",
+      "charuco_corners": 45,
+      "mean_reprojection": 0.14687307178974152
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0327.png",
+      "charuco_corners": 49,
+      "mean_reprojection": 0.11309236288070679
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0328.png",
+      "charuco_corners": 56,
+      "mean_reprojection": 0.11475438624620438
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0329.png",
+      "charuco_corners": 36,
+      "mean_reprojection": 0.11309505999088287
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0330.png",
+      "charuco_corners": 37,
+      "mean_reprojection": 0.11431600898504257
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0331.png",
+      "charuco_corners": 39,
+      "mean_reprojection": 0.09902260452508926
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0332.png",
+      "charuco_corners": 47,
+      "mean_reprojection": 0.1095912829041481
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0333.png",
+      "charuco_corners": 40,
+      "mean_reprojection": 0.12343482673168182
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0334.png",
+      "charuco_corners": 48,
+      "mean_reprojection": 0.12315759807825089
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0335.png",
+      "charuco_corners": 51,
+      "mean_reprojection": 0.11668750643730164
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0336.png",
+      "charuco_corners": 41,
+      "mean_reprojection": 0.09919917583465576
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0337.png",
+      "charuco_corners": 36,
+      "mean_reprojection": 0.11312602460384369
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0338.png",
+      "charuco_corners": 37,
+      "mean_reprojection": 0.14819981157779694
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0339.png",
+      "charuco_corners": 60,
+      "mean_reprojection": 0.13539357483386993
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0340.png",
+      "charuco_corners": 39,
+      "mean_reprojection": 0.1386667937040329
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0341.png",
+      "charuco_corners": 47,
+      "mean_reprojection": 0.12309347093105316
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0342.png",
+      "charuco_corners": 56,
+      "mean_reprojection": 0.11305277049541473
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0343.png",
+      "charuco_corners": 44,
+      "mean_reprojection": 0.20517784357070923
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0345.png",
+      "charuco_corners": 46,
+      "mean_reprojection": 0.18053029477596283
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0346.png",
+      "charuco_corners": 52,
+      "mean_reprojection": 0.14269858598709106
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0347.png",
+      "charuco_corners": 53,
+      "mean_reprojection": 0.19593816995620728
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0348.png",
+      "charuco_corners": 54,
+      "mean_reprojection": 0.18685294687747955
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0349.png",
+      "charuco_corners": 58,
+      "mean_reprojection": 0.22505971789360046
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0350.png",
+      "charuco_corners": 50,
+      "mean_reprojection": 0.14020180702209473
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0351.png",
+      "charuco_corners": 58,
+      "mean_reprojection": 0.2459140419960022
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0352.png",
+      "charuco_corners": 58,
+      "mean_reprojection": 0.17548345029354095
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0353.png",
+      "charuco_corners": 57,
+      "mean_reprojection": 0.2463575005531311
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0354.png",
+      "charuco_corners": 59,
+      "mean_reprojection": 0.26931032538414
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0355.png",
+      "charuco_corners": 51,
+      "mean_reprojection": 0.32771387696266174
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0356.png",
+      "charuco_corners": 52,
+      "mean_reprojection": 0.27417290210723877
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0357.png",
+      "charuco_corners": 57,
+      "mean_reprojection": 0.2826969027519226
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0358.png",
+      "charuco_corners": 58,
+      "mean_reprojection": 0.28419917821884155
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0359.png",
+      "charuco_corners": 62,
+      "mean_reprojection": 0.328412801027298
+    },
+    {
+      "image": "scanner_checkerboard_for_camera\\checkerboard0360.png",
+      "charuco_corners": 61,
+      "mean_reprojection": 0.35922566056251526
+    }
+  ]
+}

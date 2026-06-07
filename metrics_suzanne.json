@@ -1,0 +1,12 @@
+{
+  "reconstruction_to_ground_truth_mean": 0.11102573515532738,
+  "ground_truth_to_reconstruction_mean": 0.10282122019155551,
+  "chamfer_l1_mean": 0.10692347767344144,
+  "chamfer_l2_mean": 0.016766485480002213,
+  "reconstruction_to_ground_truth_p95": 0.2591353151924467,
+  "ground_truth_to_reconstruction_p95": 0.21984735021531318,
+  "dataset": "suzanne",
+  "sample_count": 30000,
+  "ground_truth_aligned_by_centroid_scale": true,
+  "ground_truth_aligned_by_scaling_icp": true
+}
