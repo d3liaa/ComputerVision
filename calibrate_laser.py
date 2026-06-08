@@ -11,6 +11,7 @@ from reconstruct import build_camera_matrix, build_extrinsics
 
 
 def build_charuco_board(charuco_cfg):
+    # Build the ChArUco board object from the configuration
     dictionary_name = charuco_cfg.get("dictionary", "DICT_4X4_50")
     dictionary_id = getattr(cv2.aruco, dictionary_name)
     dictionary = cv2.aruco.getPredefinedDictionary(dictionary_id)
@@ -27,14 +28,17 @@ def build_charuco_board(charuco_cfg):
 
 
 def detect_board_pose(image_gray, board, camera_matrix):
+    # Detect the ChArUco board in the grayscale image
     detector = cv2.aruco.CharucoDetector(board)
     charuco_corners, charuco_ids, _marker_corners, _marker_ids = detector.detectBoard(image_gray)
+    # 6 degrees of freedom, we require 8 corners to be safe (since the measurements may be noisy)
     if charuco_ids is None or len(charuco_ids) < 8:
         return None
 
     object_points = board.getChessboardCorners()[charuco_ids.ravel()].astype(np.float32)
     image_points = charuco_corners.reshape(-1, 2).astype(np.float32)
 
+    # Get rotation and translation that explain the board pose (we use RANSAC to be robust to detection errors)
     ok, rotation_vec, translation_vec, inliers = cv2.solvePnPRansac(
         object_points,
         image_points,
@@ -44,9 +48,11 @@ def detect_board_pose(image_gray, board, camera_matrix):
         iterationsCount=500,
         flags=cv2.SOLVEPNP_ITERATIVE,
     )
+    # Reject weak results
     if not ok or inliers is None or len(inliers) < 6:
         return None
 
+    # We refine the solution by PnPRansac by using Levenberg-Marquardt optimization
     inlier_idx = inliers.ravel()
     rotation_vec, translation_vec = cv2.solvePnPRefineLM(
         object_points[inlier_idx],
@@ -57,11 +63,13 @@ def detect_board_pose(image_gray, board, camera_matrix):
         translation_vec,
     )
 
+    # Convert rodrigues vector to rotation matrix
     rotation_board, _jacobian = cv2.Rodrigues(rotation_vec)
     return rotation_board, translation_vec.reshape(3), int(len(inlier_idx))
 
 
 def project_board_polygon(rotation_board, translation_board, board, camera_matrix):
+    # Project outer rectangle of the board to the image plane
     right_bottom = board.getRightBottomCorner()
     board_width = float(right_bottom[0])
     board_height = float(right_bottom[1])
@@ -74,6 +82,7 @@ def project_board_polygon(rotation_board, translation_board, board, camera_matri
         ],
         dtype=np.float32,
     )
+    # Project the corners to the image plane
     camera_corners = (rotation_board @ object_corners.T).T + translation_board
     projected = (camera_matrix @ camera_corners.T).T
     projected = projected[:, :2] / projected[:, 2:3]
@@ -81,6 +90,7 @@ def project_board_polygon(rotation_board, translation_board, board, camera_matri
 
 
 def camera_ray(pixel_u, pixel_v, camera_matrix):
+    # Convert 1 pixel into a 3D ray
     ray = np.array(
         [
             (pixel_u - camera_matrix[0, 2]) / camera_matrix[0, 0],
@@ -89,12 +99,25 @@ def camera_ray(pixel_u, pixel_v, camera_matrix):
         ],
         dtype=np.float64,
     )
+
+    # And we normalize it as we do not care about the magnitude
     return ray / np.linalg.norm(ray)
 
 
 def intersect_ray_with_board(ray, rotation_board, translation_board):
+    # Find where the camera ray hits the board plane
+    # In its coordinate, the normal of the plane is [0,0,1]
+    # However, we want to convert it to camera coordinates
+
+    # Ray = depth * ray_direction
+    # n * Ray = n * translation_board
+    # n * (depth*ray_direction) = n * translation_board
+    # depth(n * ray_direction) = n * translation_board
+    # depth = (n * translation_board) / (n * ray_direction)
+
     board_normal = rotation_board @ np.array([0.0, 0.0, 1.0], dtype=np.float64)
     denom = float(board_normal @ ray)
+    # If this check passes it means the ray is parallel to the plane, so no intersection..
     if abs(denom) < 1e-8:
         return None
     depth = float(board_normal @ translation_board / denom)
@@ -104,18 +127,22 @@ def intersect_ray_with_board(ray, rotation_board, translation_board):
 
 
 def fit_plane(points, iterations=4):
+    # Function that fits a plane through many 3D points (a plane is identified by a point on the plane + the normal vector)
     all_points = np.asarray(points, dtype=np.float64)
+    # We keep an array for the points that are considered inliers
     keep = np.ones(len(all_points), dtype=bool)
 
     for _iteration in range(iterations):
         selected = all_points[keep]
         center = selected.mean(axis=0)
+        # Since pixels are 3D, the 3rd eigenvalue should be much smaller than the first two (as it's the one of the z axis of the plane, hence the normal)
         _left, _values, right = np.linalg.svd(selected - center, full_matrices=False)
         normal = right[-1]
         distances = np.abs((all_points - center) @ normal)
         selected_distances = distances[keep]
         median = np.median(selected_distances)
         mad = np.median(np.abs(selected_distances - median))
+        # We exclude all points exceeding 3 standard deviations from the median (we do not compute proper s.d but approximate it)
         threshold = max(median + 3.0 * 1.4826 * mad, np.percentile(selected_distances, 85))
         keep = distances <= threshold
 
@@ -123,11 +150,13 @@ def fit_plane(points, iterations=4):
     point = selected.mean(axis=0)
     _left, _values, right = np.linalg.svd(selected - point, full_matrices=False)
     normal = right[-1]
+    # As we only care about the direction of the normal, we can normalize it to make it more interpretable and stable for later use
     normal = normal / np.linalg.norm(normal)
     return normal, point, keep
 
 
 def camera_plane_to_world(normal_camera, point_camera, camera_cfg):
+    # Convert fitted laser plane from camera to world coordinates
     rotation_world_to_camera, translation_world_to_camera = build_extrinsics(camera_cfg)
     normal_world = rotation_world_to_camera.T @ normal_camera
     normal_world = normal_world / np.linalg.norm(normal_world)
@@ -136,6 +165,7 @@ def camera_plane_to_world(normal_camera, point_camera, camera_cfg):
 
 
 def calibrate_laser(root_config):
+    # Main function that performs the laser calibration.
     dataset_name = root_config["active"]
     config = root_config[dataset_name]
     calibration_cfg = config["calibration"]
