@@ -21,20 +21,34 @@ def select_image_paths(image_paths, max_frames):
 def fit_circle_3d(points):
     # Find the parameters of the circle that best fits the provided points
     points = np.asarray(points, dtype=np.float64)
+    # Zero-center points so that then we can use SVD to recover plane the circle lies on (object is posed on the disk, so normal of the plane = turntable axis)
     centroid = points.mean(axis=0)
+    # Here we only care about vh: the smaller singular value corresponds to the z axis of the circle plane, as the points all lie approximately at the same z (so finding the plane that best fits this points allows us to find the normal)
     _, _, vh = np.linalg.svd(points - centroid, full_matrices=False)
     basis_u, basis_v, axis = vh
+    # For computational reasons, we normalize the vector
     axis = axis / np.linalg.norm(axis)
 
+    # Project each 3D point to the plane basis
     xy = np.column_stack(((points - centroid) @ basis_u, (points - centroid) @ basis_v))
     x = xy[:, 0]
     y = xy[:, 1]
     system = np.column_stack((x, y, np.ones_like(x)))
+    # A circle in 2D with center (h,k) and radius r satisfies:
+    # (x-h)^2 + (y-k)^2 = r^2
+    # => x^2 - 2xh + h^2 + y^2 - 2yk + k^2 = r^2
+    # => x^2 + y^2 - 2hx - 2ky + (h^2 + k^2 - r^2) = 0
+    # => -2hx - 2ky + (h^2 + k^2 - r^2) = -(x^2 + y^2)
+    # Since our goal is to find h, k, r, we can set a = -2h, b = -2k, c = h^2 + k^2 - r^2 and solve the linear system for a, b, c. Then we can recover h, k, r from a, b, c.
+    # In particular, we solve ax+by+c=-(x^2+y^2) for a, b, c and then compute h=-a/2, k=-b/2, r=sqrt(h^2+k^2-c).
+    # Then, we recover from a, b, c the original parameters of the circle: center (h, k) and radius r.
     rhs = -(x * x + y * y)
     a, b, c = np.linalg.lstsq(system, rhs, rcond=None)[0]
     center_xy = np.array([-0.5 * a, -0.5 * b])
+    # We operated in plane coordinates, so we map back to 3D by using the plane basis and adding the centroid offset
     radius = float(np.sqrt(max(center_xy @ center_xy - c, 0.0)))
     center = centroid + center_xy[0] * basis_u + center_xy[1] * basis_v
+    # And we also computed radial fitted error
     residuals = np.abs(np.linalg.norm(xy - center_xy, axis=1) - radius)
     return center, axis, radius, residuals
 
@@ -42,24 +56,33 @@ def fit_circle_3d(points):
 def robust_fit_circle_3d(points, iterations=4):
     # Find the parameters of the circle that best fits the provided points, rejecting outliers
     points = np.asarray(points, dtype=np.float64)
+    # At start, we consider all points as inliers
     keep = np.ones(len(points), dtype=bool)
 
     for _ in range(iterations):
+        # Initially, try to fit a circle to all points
         center, axis, radius, _ = fit_circle_3d(points[keep])
+        # Build a local circle coordinate system
         basis_z = axis / np.linalg.norm(axis)
         basis_x = points[keep][0] - center
         basis_x -= basis_z * float(basis_x @ basis_z)
+        # Handle the case in which the first point is almost aligned with the axis, by picking an arbitrary point on the plane as basis_x
         if np.linalg.norm(basis_x) < 1e-8:
             basis_x = np.array([1.0, 0.0, 0.0], dtype=np.float64)
             basis_x -= basis_z * float(basis_x @ basis_z)
+        # Normalize the basis_x vector to get a proper orthonormal basis for the plane
         basis_x /= np.linalg.norm(basis_x)
+        # The basis_y vector is the cross product of the normal (basis_z) and the basis_x, to get a right-handed coordinate system for the plane
         basis_y = np.cross(basis_z, basis_x)
+        # Project points to the local circle coordinate system
         xy = np.column_stack(((points - center) @ basis_x, (points - center) @ basis_y))
         residuals = np.abs(np.linalg.norm(xy, axis=1) - radius)
         kept_residuals = residuals[keep]
         median = np.median(kept_residuals)
         mad = np.median(np.abs(kept_residuals - median))
+        # We set the threshold to be media + 3 times the standard deviation of the residuals, which we approximate here with a commonly used value of 1.4826 * MAD (and keep 75th percentile as a fallback if MAD is very small)
         threshold = max(median + 3.0 * 1.4826 * mad, np.percentile(kept_residuals, 75))
+        # For the next iteration, we only keep points whose residual is below the threshold
         keep = residuals <= threshold
 
     center, axis, radius, residuals = fit_circle_3d(points[keep])
@@ -160,24 +183,31 @@ def solve_rotation_center_corners(rotations, translations, board, axis_camera):
 def detect_board_poses(image_paths, board, camera_matrix, dist_coeffs, min_corners):
     # Detect the ChArUco board
     detector = cv2.aruco.CharucoDetector(board)
+    # Get the corners of this object, in charuco-board coordinate system
     board_corners = board.getChessboardCorners()
     records = []
     image_size = None
 
     for path in image_paths:
+        # Load image
         image = cv2.imread(path)
         if image is None:
             continue
+        # Convert it to grayscale
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         if image_size is None:
             image_size = [gray.shape[1], gray.shape[0]]
-
+        
+        # Detect corners by using convenient detector
+        # Since a 3D pose has 6 degrees of freedom, we need at least 4 corners to get a valid pose (we require more for more robust estimation tho)
         corners, ids, _, _ = detector.detectBoard(gray)
         if ids is None or len(ids) < min_corners:
             continue
 
+        # Take 3D points of the detected corners in the board coordinate systems (and their projection to the image)
         object_points = board_corners[ids.ravel()].astype(np.float32)
         image_points = corners.reshape(-1, 2).astype(np.float32)
+        # Now we need to find R and t such that R @ object_points + t is close to the corresponding points in the image_points, we use solvePnP for simplicity
         ok, rvec, tvec = cv2.solvePnP(
             object_points,
             image_points,
@@ -188,6 +218,7 @@ def detect_board_poses(image_paths, board, camera_matrix, dist_coeffs, min_corne
         if not ok:
             continue
 
+        # Project back to the image, to verify whether the pose is good or not
         projected, _ = cv2.projectPoints(object_points, rvec, tvec, camera_matrix, dist_coeffs)
         errors = np.linalg.norm(projected.reshape(-1, 2) - image_points, axis=1)
         records.append(
@@ -204,27 +235,27 @@ def detect_board_poses(image_paths, board, camera_matrix, dist_coeffs, min_corne
 
 
 def camera_to_world_point(point_camera, camera_cfg):
-    # Transform camera coordinates point to world coordinates point
+    # Transform a point from camera coordinates to world coordinates
     rotation_world_to_camera, translation_world_to_camera = build_extrinsics(camera_cfg)
-    return rotation_world_to_camera.T @ (point_camera - translation_world_to_camera)
+    return rotation_world_to_camera.T @ (point_camera - translation_world_to_camera) # (we can use .T instead of inverse as they are equal, given R is a rotation matrix)
 
 
 def camera_to_world_vector(vector_camera, camera_cfg):
-    # Transform camera coordinates vector to world coordinates vector (translation doesn't matter)
+    # Transform a vector from camera coordinates to world coordinates (translation doesn't matter)
     rotation_world_to_camera, _ = build_extrinsics(camera_cfg)
     return rotation_world_to_camera.T @ vector_camera
-
+    
 
 def build_turntable_frame_camera(center_camera, axis_camera, translations):
     # Build a camera-to-world rotation matrix that aligns the world Z axis to the turntable axis, and the world origin to the turntable center.
-    z_axis = axis_camera / np.linalg.norm(axis_camera)
-    x_axis = translations[0] - center_camera
-    x_axis -= z_axis * float(x_axis @ z_axis)
+    z_axis = axis_camera / np.linalg.norm(axis_camera) # Take the turntable axis as the Z axis of the world
+    x_axis = translations[0] - center_camera # Take the first board position as a reference to build the X axis of the world
+    x_axis -= z_axis * float(x_axis @ z_axis) # Project vector onto the disk plane to avoid numerical issues
     if np.linalg.norm(x_axis) < 1e-8:
         x_axis = np.array([1.0, 0.0, 0.0], dtype=np.float64)
         x_axis -= z_axis * float(x_axis @ z_axis)
     x_axis /= np.linalg.norm(x_axis)
-    y_axis = np.cross(z_axis, x_axis)
+    y_axis = np.cross(z_axis, x_axis) # Compute y axis as the cross product of the two other axis 
     y_axis /= np.linalg.norm(y_axis)
     return np.column_stack((x_axis, y_axis, z_axis))
 
@@ -232,6 +263,7 @@ def build_turntable_frame_camera(center_camera, axis_camera, translations):
 def config_camera_pose(camera_cfg):
     # Given camera exstrincs, report its location in world coordinates 
     rotation_world_to_camera, translation_world_to_camera = build_extrinsics(camera_cfg)
+    # p_c = R @ p_w + t => p_w = R.T @ (p_c - t) = R.T @ p_c - R.T @ t, so the camera location in world coordinates is -R.T @ t
     location = -rotation_world_to_camera.T @ translation_world_to_camera
     return {
         "world_to_camera_rotation": rotation_world_to_camera.tolist(),
@@ -253,6 +285,7 @@ def calibrate_camera(root_config, max_frames=90, min_corners=12):
 
     selected_paths = select_image_paths(image_paths, max_frames)
     camera_matrix = build_camera_matrix(config["camera"])
+    # We assume no lens distortion 
     dist_coeffs = np.zeros((5, 1), dtype=np.float64)
     records, image_size = detect_board_poses(selected_paths, board, camera_matrix, dist_coeffs, min_corners)
     if len(records) < 10:
