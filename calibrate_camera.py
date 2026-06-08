@@ -94,11 +94,16 @@ def estimate_disk_axis_camera(rotations, min_angle_deg=3.0, stride=5, max_gap=40
     axes = []
     count = len(rotations)
     for i in range(count):
+        # Use stride to avoid comparing close frames, max_cap to avoid comparing very far frames
         for j in range(i + stride, min(i + max_gap, count)):
+            # We compute the relative rotation between the two board poses
             relative = rotations[j] @ rotations[i].T
+            # And the angle between them
             cos_angle = np.clip((np.trace(relative) - 1.0) / 2.0, -1.0, 1.0)
+            # Skip small angles.. redudant poses
             if np.arccos(cos_angle) < np.radians(min_angle_deg):
                 continue
+            # From cross product formula take the difference between the off-diagonal elements [u_x1 - u_x2, u_y2 - u_y1, u_z1 - u_z2] to get a vector parallel to the rotation axis
             axis = np.array([
                 relative[2, 1] - relative[1, 2],
                 relative[0, 2] - relative[2, 0],
@@ -107,11 +112,14 @@ def estimate_disk_axis_camera(rotations, min_angle_deg=3.0, stride=5, max_gap=40
             norm = np.linalg.norm(axis)
             if norm < 1e-8:
                 continue
+            # We do not care about the magnitude, but only the direction of the vector
             axes.append(axis / norm)
     if len(axes) < 5:
         raise ValueError("Not enough rotated board pairs to estimate the disk axis")
     axes = np.asarray(axes)
+    # Align all axes to the same sign, since each axis could be either positive or negative (with the same semantics tho)
     axes[axes @ axes[0] < 0] *= -1.0
+    # Then take the average out of all of them
     axis = axes.mean(axis=0)
     spread = float(np.degrees(np.std(np.arccos(np.clip(axes @ (axis / np.linalg.norm(axis)), -1.0, 1.0)))))
     return axis / np.linalg.norm(axis), spread
@@ -119,19 +127,33 @@ def estimate_disk_axis_camera(rotations, min_angle_deg=3.0, stride=5, max_gap=40
 
 def solve_rotation_center_camera(rotations, translations, axis_camera, stride=5, max_gap=40):
     # Estimate the fixed rotation center from board poses
+    # Starting from some math
+    # t_j = A (t_i - c) + c, where t_j is the origin of the board in the jth frame, while t_i is the one in the ith frame, c is the unknown center of rotation
+    # t_j = At_i - Ac + c
+    # t_j = At_i + (I-A)c
+    # (A-I)c = At_i - t_j
+    # We can build a linear system by considering multiple pairs of frames, and then solve it (for c)
+    # Note: we do not use it anymore as solve_rotation_center_corners is more robust :)
+
     a_blocks = []
     b_blocks = []
     count = len(rotations)
     eye = np.eye(3)
     for i in range(count):
         for j in range(i + stride, min(i + max_gap, count)):
+            # Get relative rotation between the two board poses (A = relative)
             relative = rotations[j] @ rotations[i].T
+            # diff = A - I
             diff = relative - eye
+            # left-hand side of the equation
             a_blocks.append(diff)
+            # right-hand side of the equation
             b_blocks.append(diff @ translations[i] - (translations[j] - translations[i]))
     a_matrix = np.vstack(a_blocks)
     b_vector = np.concatenate(b_blocks)
+    # And find by least square the center that best explains all the observed rotations and translations
     center, *_ = np.linalg.lstsq(a_matrix, b_vector, rcond=None)
+    # Since the board is posed on the disk, the center should lie on the plane orthogonal to the axis, so we project it to this plane to avoid numerical issues
     center = center - axis_camera * float((center - translations.mean(axis=0)) @ axis_camera)
     return center
 
@@ -146,24 +168,39 @@ def rotation_about_axis(axis, theta):
 
 
 def solve_rotation_center_corners(rotations, translations, board, axis_camera):
-    # Given the board poses, find the point in camera coordinates that is fixed by all the rotations. 
+    # Given the board poses, find the point in camera coordinates that is fixed by all the rotations.
+    # For each frame, each board corner is transformed into camera coordinates:
+    # X_{fk} = R_f @ P_k + t_f 
+
+    # Get all corners first
     object_corners = board.getChessboardCorners().astype(np.float64)  # (M, 3)
     reference = rotations[0]
     angles = []
+    # Store all relative rotations between the first frame and all others
     for rotation in rotations:
         rotation_vector, _ = cv2.Rodrigues(rotation @ reference.T)
         angles.append(float(rotation_vector.ravel() @ axis_camera))
 
-    rotated_corners = []   # A_f @ P_{f}
+    rotated_corners = []   # A_f @ P_f
     frame_b = []           # B_f = I - A_f
+
+    # The correct unrotation of a point X would be:
+    # X' = A_f @ (X-c) + c
+    # Hence,
+    # X' = A_f @ X + (I - A_f) @ c, where A_f is the relative rotation between the two frames
+
     for rotation, translation, angle in zip(rotations, translations, angles):
         corners_camera = (rotation @ object_corners.T).T + translation  # (M, 3)
+        # We unrotate the corners to make them all aligned, so that the only difference between them should be the translation of the center
         unrotate = rotation_about_axis(axis_camera, -angle)
         rotated_corners.append((unrotate @ corners_camera.T).T)
-        frame_b.append(np.eye(3) - unrotate)
+        frame_b.append(np.eye(3) - unrotate) # (I - A_f)
 
+    # Take mean of left hand side and right-hand side of the equation to improve numerical stability, as the result does not change
     mean_rotated = np.mean(np.stack(rotated_corners), axis=0)  # (M, 3)
     mean_b = np.mean(np.stack(frame_b), axis=0)                # (3, 3)
+
+    # Finally, build the system to be solved by least squared method
 
     corner_count = object_corners.shape[0]
     e_rows = []
