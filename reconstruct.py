@@ -6,6 +6,7 @@ import open3d as o3d
 
 
 def build_camera_matrix(cam):
+    # Camera intrinsics are assumed to be given, so we just set up a camera matrix K
     fx = cam.get("fx_px", cam["focal_length_mm"] * cam["image_width"] / cam["sensor_width_mm"])
     fy = cam.get("fy_px", fx)
     cx = cam.get("cx_px", cam["image_width"] / 2.0)
@@ -16,6 +17,7 @@ def build_camera_matrix(cam):
 
 
 def rotation_x(deg):
+    # Rotation matrix around the X axis
     a = np.radians(deg)
     return np.array([[1,          0,           0],
                      [0, np.cos(a), -np.sin(a)],
@@ -23,6 +25,7 @@ def rotation_x(deg):
 
 
 def rotation_y(deg):
+    # Rotation matrix around the Y axis
     a = np.radians(deg)
     return np.array([[np.cos(a), 0, np.sin(a)],
                      [0,         1, 0],
@@ -30,6 +33,7 @@ def rotation_y(deg):
 
 
 def rotation_z(deg):
+    # Rotation matrix around the Z axis
     a = np.radians(deg)
     return np.array([[np.cos(a), -np.sin(a), 0],
                      [np.sin(a),  np.cos(a), 0],
@@ -37,6 +41,7 @@ def rotation_z(deg):
 
 
 def rotation_axis_angle(axis, deg):
+    # Rotation matrix around an arbitrary axis
     axis = np.array(axis, dtype=np.float64)
     axis /= np.linalg.norm(axis)
     a = np.radians(deg)
@@ -55,6 +60,7 @@ def rotation_axis_angle(axis, deg):
 
 
 def disk_frame(axis, reference=(1.0, 0.0, 0.0)):
+    # Build coordinate system for the disk (i.e. the one with center at the disk center, z axis aligned with the disk axis and x axis as close as possible to the reference vector while being perpendicular to the z axis)
     z_axis = np.array(axis, dtype=np.float64)
     z_axis /= np.linalg.norm(z_axis)
     x_axis = np.array(reference, dtype=np.float64)
@@ -63,17 +69,21 @@ def disk_frame(axis, reference=(1.0, 0.0, 0.0)):
         x_axis = np.array([0.0, 1.0, 0.0], dtype=np.float64)
         x_axis -= z_axis * float(x_axis @ z_axis)
     x_axis /= np.linalg.norm(x_axis)
+    # As usual, y axis given as cross product to ensure orthogonality
     y_axis = np.cross(z_axis, x_axis)
     y_axis /= np.linalg.norm(y_axis)
     return np.column_stack((x_axis, y_axis, z_axis))
 
 
 def build_extrinsics(cam):
+    # If extrinsics are provided directly, use them
     if "world_to_camera_rotation" in cam and "world_to_camera_translation" in cam:
         return (
             np.array(cam["world_to_camera_rotation"], dtype=np.float64),
             np.array(cam["world_to_camera_translation"], dtype=np.float64),
         )
+    
+    # Otherwise, we build the extrinsic matrix from the camera rotation and location (assuming the rotation is given in Euler angles in degrees, applied in XYZ order, and the location is given in world coordinates)
 
     rx, ry, rz = cam["rotation_euler_deg"]
 
@@ -89,9 +99,16 @@ def build_extrinsics(cam):
 
 
 def ray_plane_intersect(origin, direction, plane_normal, plane_point, min_abs_denom=1e-8):
+    # Compute the intersection between a plane and a ray
+    # X(t) = O + t * D, where O is the ray origin, D is the ray direction and t is a scalar
+    # A plane is n*(X-P) = 0, where n is the plane normal, P is any point on the plane
+    # We start by checking how aligned the ray is with the plane
     denom = plane_normal @ direction
+    # If nearly parallel, no intersection
     if abs(denom) < min_abs_denom:
         return None
+    # Otherwise, apply formula derived from substituting the ray equation into the plane equation
+    # n(x-P) = 0 -> n(O + tD - P) = 0 -> nO + t nD - nP = 0 -> tnd = nO - nP -> t = (nP - nO) / nD = n(P-O) / nD
     t = (plane_normal @ (plane_point - origin)) / denom
     if t < 0:
         return None
@@ -99,12 +116,14 @@ def ray_plane_intersect(origin, direction, plane_normal, plane_point, min_abs_de
 
 
 def reconstruct(config):
+    # Main function that performs the 3D reconstruction from the detected stripe coordinates and the estimated configuration
     cam   = config["camera"]
     laser = config["laser"]
     disk  = config["disk"]
     K              = build_camera_matrix(cam)
     R_cam, t_cam   = build_extrinsics(cam)
-    cam_origin     = -R_cam.T @ t_cam # camera position in world space
+    # RC + t = 0 -> C = -R^T t, so we can get the camera position in world space as the negative of the rotated translation vector
+    cam_origin     = -R_cam.T @ t_cam
 
     plane_normal = np.array(laser["normal"], dtype=np.float64)
     plane_point  = np.array(laser["point"],  dtype=np.float64)
@@ -127,13 +146,17 @@ def reconstruct(config):
     all_points = []
 
     for i, path in enumerate(coord_files):
-        coords = np.load(path)      # shape (N, 2): each row is (v, u)
+        # For each frame, we load the detected stripe coordinates
+        coords = np.load(path) # shape (N, 2): each row is (v, u)
         if len(coords) == 0:
             continue
 
+        # As the angle between each frame is known, we can compute the angle for the current frame
         angle = rotation_direction * i * disk["angle_per_frame_deg"]
+        # Compute matrix to undo rotation of the disk, so we can bring points back to a common object-local space where the disk is not rotated (but still centered at the disk center, and with the same axis)
         R_disk_inv = rotation_axis_angle(disk_axis, angle)
 
+        # Loop through each laser stripe pixel
         for v, u in coords:
             # Pixel to normalized ray in OpenCV camera space
             ray_cam = np.array([(u - K[0, 2]) / K[0, 0],
@@ -144,6 +167,7 @@ def reconstruct(config):
             ray_world = R_cam.T @ ray_cam
             ray_world /= np.linalg.norm(ray_world)
 
+            # Find intersection between ray and laser plane
             point = ray_plane_intersect(cam_origin, ray_world, plane_normal, plane_point, min_abs_denom)
             if point is None:
                 continue
@@ -171,6 +195,7 @@ def reconstruct(config):
 
 
 def save_ply(points, path):
+    # Save the reconstructed points as a PLY file (ASCII format)
     with open(path, "w") as f:
         f.write("ply\nformat ascii 1.0\n")
         f.write(f"element vertex {len(points)}\n")
@@ -181,6 +206,7 @@ def save_ply(points, path):
 
 
 def make_point_cloud(points):
+    # Convert the reconstructed points to an Open3D point cloud, filtering out any points with NaN or infinite values
     points = points[np.isfinite(points).all(axis=1)]
     point_cloud = o3d.geometry.PointCloud()
     point_cloud.points = o3d.utility.Vector3dVector(points.astype(np.float64))
@@ -188,12 +214,11 @@ def make_point_cloud(points):
 
 
 def clean_point_cloud(point_cloud):
+    # Clean the point cloud by removing outliers and keeping only the largest connected cluster, which should correspond to the main object (while removing detached blobs and stray points that can be caused by laser reflections or noise)
     if len(point_cloud.points) < 30:
         raise ValueError("Need at least 30 points for surface reconstruction")
     cleaned, _ = point_cloud.remove_statistical_outlier(nb_neighbors=24, std_ratio=2.0)
 
-    # Keep only the largest connected cluster to drop detached laser-reflection
-    # blobs and stray floating points while preserving the main object.
     if len(cleaned.points) >= 30:
         labels = np.asarray(cleaned.cluster_dbscan(eps=0.06, min_points=14))
         if labels.max() >= 0:
@@ -204,6 +229,9 @@ def clean_point_cloud(point_cloud):
 
 
 def estimate_normals(point_cloud, camera_location=None):
+    # Estimate normals for the point cloud, which are needed for the Poisson surface reconstruction. 
+    # We use a search radius based on the size of the bounding box to ensure we capture enough neighbors for normal estimation, while keeping it small enough to preserve details. 
+    # We also orient the normals consistently, either towards the camera location if provided or using a tangent plane method otherwise.
     bbox = point_cloud.get_axis_aligned_bounding_box()
     radius = max(float(np.linalg.norm(bbox.get_extent())) * 0.03, 1e-3)
     point_cloud.estimate_normals(
@@ -218,23 +246,31 @@ def estimate_normals(point_cloud, camera_location=None):
 
 
 def reconstruct_surface(points, out_path, depth=9, density_quantile=0.04, camera_location=None):
+    # This function converts a pointcloud into a surface mesh using Poisson reconstruction
+    # First we clean the pointcloud as outliers poison the reconstruction
     point_cloud = clean_point_cloud(make_point_cloud(points))
+    # Then we estimate the normals for each point, which are needed for the Poisson reconstruction. We orient them towards the camera location if provided, which can help with consistency and reduce noise in the reconstruction.
     estimate_normals(point_cloud, camera_location=camera_location)
 
+    # Run Poisson reconstruction to get a surface mesh. 
+    # The depth parameter controls the resolution of the reconstruction (higher values capture more detail but are slower and can overfit noise, while lower values produce smoother meshes). 
+    # We also get a density value for each vertex, which indicates how well supported it is by the input points (lower density vertices are more likely to be artifacts or noise, so we can filter them out by keeping only those above a certain quantile).
     mesh, densities = o3d.geometry.TriangleMesh.create_from_point_cloud_poisson(
         point_cloud, depth=depth
     )
+    # Since we have the density for each vertex, let us filter out low density ones, as they are likely artifacts or noise
     density_values = np.asarray(densities)
     if len(density_values) > 0:
         mesh.remove_vertices_by_mask(density_values < np.quantile(density_values, density_quantile))
 
-    bbox = point_cloud.get_axis_aligned_bounding_box().scale(1.05, point_cloud.get_center())
+    # Some more cleaning
+    bbox = point_cloud.get_axis_aligned_bounding_box().scale(1.05, point_cloud.get_center()) # crop the mesh to a slightly larger bb than that formed by the input points, to remove outliers far from the main object
     mesh = mesh.crop(bbox)
     mesh.remove_degenerate_triangles()
     mesh.remove_duplicated_triangles()
     mesh.remove_duplicated_vertices()
     mesh.remove_non_manifold_edges()
-    mesh.compute_vertex_normals()
+    mesh.compute_vertex_normals() # compute normals if one wants to inspect/visualize them (can be removed if not needed)
 
     if not o3d.io.write_triangle_mesh(out_path, mesh):
         raise OSError(f"Could not write mesh: {out_path}")
@@ -242,6 +278,7 @@ def reconstruct_surface(points, out_path, depth=9, density_quantile=0.04, camera
 
 
 def export_mesh(mesh, path):
+    # Export mesh to viewable obj format
     os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
     mesh.compute_vertex_normals()
     if not o3d.io.write_triangle_mesh(path, mesh, write_vertex_normals=True):
@@ -249,6 +286,7 @@ def export_mesh(mesh, path):
 
 
 def sample_mesh(path, sample_count):
+    # Sample points uniformly from a mesh
     mesh = o3d.io.read_triangle_mesh(path)
     if len(mesh.triangles) == 0:
         raise ValueError(f"Mesh has no triangles: {path}")
@@ -256,14 +294,18 @@ def sample_mesh(path, sample_count):
 
 
 def align_by_centroid_scale(source, target):
+    # Align one point cloud to another by matching centroid and overall scale
+    # We compute the centroid of each point cloud and pair points based on proximity to the centroid
     source_points = np.asarray(source.points)
     target_points = np.asarray(target.points)
     source_center = source_points.mean(axis=0)
     target_center = target_points.mean(axis=0)
     source_rms = float(np.sqrt(np.mean(np.sum((source_points - source_center) ** 2, axis=1))))
     target_rms = float(np.sqrt(np.mean(np.sum((target_points - target_center) ** 2, axis=1))))
+    # If the two point clouds are on different scale, we account for this
     scale = target_rms / source_rms if source_rms > 1e-12 else 1.0
 
+    # And finally we compute the aligned points by applying the scale and the translation to match the centroids
     aligned_points = (source_points - source_center) * scale + target_center
     aligned = o3d.geometry.PointCloud()
     aligned.points = o3d.utility.Vector3dVector(aligned_points)
@@ -275,11 +317,14 @@ align_by_bbox = align_by_centroid_scale
 
 
 def align_by_icp(source, target):
+    # Refine the alignment by using ICP (Iterative Closest Point)
     target_extent = float(np.linalg.norm(target.get_axis_aligned_bounding_box().get_extent()))
+    # Only align points that are withing a certain distance threshold
     threshold = max(target_extent * 0.2, 1e-3)
     center = source.get_center()
     estimator = o3d.pipelines.registration.TransformationEstimationPointToPoint(with_scaling=True)
     best = None
+    # Try multiple ICP runs to find optimal alignment, as ICP can get stuck in local minima. Also try different rotations and vertical axis to account for potential symmetries in the object
     for yaw in np.linspace(0.0, 2.0 * np.pi, 8, endpoint=False):
         seed = np.eye(4)
         c, s = np.cos(yaw), np.sin(yaw)
@@ -296,6 +341,7 @@ def align_by_icp(source, target):
 
 
 def chamfer_metrics(reconstruction, ground_truth):
+    # Compute Chamfer distance metrics between two point clouds
     recon_to_gt = np.asarray(reconstruction.compute_point_cloud_distance(ground_truth))
     gt_to_recon = np.asarray(ground_truth.compute_point_cloud_distance(reconstruction))
     return {
@@ -309,13 +355,19 @@ def chamfer_metrics(reconstruction, ground_truth):
 
 
 def validate_reconstruction(config, dataset_name, sample_count=30000):
+    # Function to compute the Chamfer distance between the reconstructed mesh and the ground truth mesh
     paths = config["paths"]
     o3d.utility.random.seed(42)
+    # Sample some points uniformally from both meshes
     reconstruction = sample_mesh(paths["reconstructed_mesh"], sample_count)
+    # Sample the ground truth mesh for comparison
     ground_truth = sample_mesh(paths["ground_truth_mesh"], sample_count)
+    # Try to align the two
     ground_truth = align_by_centroid_scale(ground_truth, reconstruction)
+    # Then refine the alignment by using ICP
     ground_truth = align_by_icp(ground_truth, reconstruction)
 
+    # Finally compute chamfer metrics
     metrics = chamfer_metrics(reconstruction, ground_truth)
     metrics.update({
         "dataset": dataset_name,
