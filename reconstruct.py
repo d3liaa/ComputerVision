@@ -231,25 +231,20 @@ def clean_point_cloud(point_cloud):
 def estimate_normals(point_cloud, camera_location=None):
     # Estimate normals for the point cloud, which are needed for the Poisson surface reconstruction. 
     # We use a search radius based on the size of the bounding box to ensure we capture enough neighbors for normal estimation, while keeping it small enough to preserve details. 
-    # We also orient the normals consistently, either towards the camera location if provided or using a tangent plane method otherwise.
+    # We orient the normals consistently using the tangent plane method, which works correctly for full 360° turntable scans.
     bbox = point_cloud.get_axis_aligned_bounding_box()
     radius = max(float(np.linalg.norm(bbox.get_extent())) * 0.03, 1e-3)
     point_cloud.estimate_normals(
         search_param=o3d.geometry.KDTreeSearchParamHybrid(radius=radius, max_nn=40)
     )
-    if camera_location is not None:
-        point_cloud.orient_normals_towards_camera_location(
-            np.asarray(camera_location, dtype=np.float64)
-        )
-    else:
-        point_cloud.orient_normals_consistent_tangent_plane(30)
+    point_cloud.orient_normals_consistent_tangent_plane(30)
 
 
 def reconstruct_surface(points, out_path, depth=9, density_quantile=0.04, camera_location=None):
     # This function converts a pointcloud into a surface mesh using Poisson reconstruction
     # First we clean the pointcloud as outliers poison the reconstruction
     point_cloud = clean_point_cloud(make_point_cloud(points))
-    # Then we estimate the normals for each point, which are needed for the Poisson reconstruction. We orient them towards the camera location if provided, which can help with consistency and reduce noise in the reconstruction.
+    # Then we estimate the normals for each point, which are needed for the Poisson reconstruction.
     estimate_normals(point_cloud, camera_location=camera_location)
 
     # Run Poisson reconstruction to get a surface mesh. 
