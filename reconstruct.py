@@ -3,6 +3,9 @@ import json
 import glob
 import os
 import open3d as o3d
+import scipy.ndimage
+from scipy.spatial import cKDTree
+from skimage.measure import marching_cubes
 
 
 def build_camera_matrix(cam):
@@ -206,7 +209,7 @@ def save_ply(points, path):
 
 
 def make_point_cloud(points):
-    # Convert the reconstructed points to an Open3D point cloud, filtering out any points with NaN or infinite values
+    # Drop any NaN or infinite points before creating the cloud.
     points = points[np.isfinite(points).all(axis=1)]
     point_cloud = o3d.geometry.PointCloud()
     point_cloud.points = o3d.utility.Vector3dVector(points.astype(np.float64))
@@ -214,7 +217,8 @@ def make_point_cloud(points):
 
 
 def clean_point_cloud(point_cloud):
-    # Clean the point cloud by removing outliers and keeping only the largest connected cluster, which should correspond to the main object (while removing detached blobs and stray points that can be caused by laser reflections or noise)
+    # Remove statistical outliers, then keep only the largest DBSCAN cluster
+    # so stray reflections and noise blobs don't pollute the reconstruction.
     if len(point_cloud.points) < 30:
         raise ValueError("Need at least 30 points for surface reconstruction")
     cleaned, _ = point_cloud.remove_statistical_outlier(nb_neighbors=24, std_ratio=2.0)
@@ -229,9 +233,8 @@ def clean_point_cloud(point_cloud):
 
 
 def estimate_normals(point_cloud, camera_location=None):
-    # Estimate normals for the point cloud, which are needed for the Poisson surface reconstruction. 
-    # We use a search radius based on the size of the bounding box to ensure we capture enough neighbors for normal estimation, while keeping it small enough to preserve details. 
-    # We orient the normals consistently using the tangent plane method, which works correctly for full 360° turntable scans.
+    # Search radius is 3% of the bounding box diagonal, which balances detail vs stability.
+    # Tangent-plane orientation works well for full 360-degree turntable scans.
     bbox = point_cloud.get_axis_aligned_bounding_box()
     radius = max(float(np.linalg.norm(bbox.get_extent())) * 0.03, 1e-3)
     point_cloud.estimate_normals(
@@ -241,33 +244,219 @@ def estimate_normals(point_cloud, camera_location=None):
 
 
 def reconstruct_surface(points, out_path, depth=9, density_quantile=0.04, camera_location=None):
-    # This function converts a pointcloud into a surface mesh using Poisson reconstruction
-    # First we clean the pointcloud as outliers poison the reconstruction
+    # Poisson surface reconstruction. Depth controls resolution; higher = more detail but slower.
+    # Low-density vertices (outside the density_quantile threshold) are trimmed as they tend to be floaters.
     point_cloud = clean_point_cloud(make_point_cloud(points))
-    # Then we estimate the normals for each point, which are needed for the Poisson reconstruction.
     estimate_normals(point_cloud, camera_location=camera_location)
 
-    # Run Poisson reconstruction to get a surface mesh. 
-    # The depth parameter controls the resolution of the reconstruction (higher values capture more detail but are slower and can overfit noise, while lower values produce smoother meshes). 
-    # We also get a density value for each vertex, which indicates how well supported it is by the input points (lower density vertices are more likely to be artifacts or noise, so we can filter them out by keeping only those above a certain quantile).
     mesh, densities = o3d.geometry.TriangleMesh.create_from_point_cloud_poisson(
         point_cloud, depth=depth
     )
-    # Since we have the density for each vertex, let us filter out low density ones, as they are likely artifacts or noise
     density_values = np.asarray(densities)
     if len(density_values) > 0:
         mesh.remove_vertices_by_mask(density_values < np.quantile(density_values, density_quantile))
 
-    # Some more cleaning
-    bbox = point_cloud.get_axis_aligned_bounding_box().scale(1.05, point_cloud.get_center()) # crop the mesh to a slightly larger bb than that formed by the input points, to remove outliers far from the main object
+    # Crop to a slightly enlarged bounding box to discard far-away floaters.
+    bbox = point_cloud.get_axis_aligned_bounding_box().scale(1.05, point_cloud.get_center())
     mesh = mesh.crop(bbox)
     mesh.remove_degenerate_triangles()
     mesh.remove_duplicated_triangles()
     mesh.remove_duplicated_vertices()
     mesh.remove_non_manifold_edges()
-    mesh.compute_vertex_normals() # compute normals if one wants to inspect/visualize them (can be removed if not needed)
+    mesh.compute_vertex_normals()
 
     if not o3d.io.write_triangle_mesh(out_path, mesh):
+        raise OSError(f"Could not write mesh: {out_path}")
+    return mesh
+
+
+def reconstruct_surface_sdf(
+    points,
+    out_path,
+    voxel_resolution=128,
+    smooth_sigma=1.5,
+    padding_factor=0.15,
+    k_sign=8,
+    camera_location=None,
+):
+    # Build a volumetric SDF on a regular voxel grid, smooth it with a Gaussian filter,
+    # then extract the zero iso-surface via marching cubes.
+    # Sign is computed via a discrete winding-number approximation (see below) which
+    # handles thin protrusions like ears correctly without any external C++ libraries.
+    pcd = clean_point_cloud(make_point_cloud(points))
+    estimate_normals(pcd, camera_location=camera_location)
+
+    pts = np.asarray(pcd.points, dtype=np.float64)
+    nrm = np.asarray(pcd.normals, dtype=np.float64)
+
+    pad = padding_factor * np.ptp(pts, axis=0)
+    bbox_min = pts.min(axis=0) - pad
+    bbox_max = pts.max(axis=0) + pad
+
+    xs = np.linspace(bbox_min[0], bbox_max[0], voxel_resolution)
+    ys = np.linspace(bbox_min[1], bbox_max[1], voxel_resolution)
+    zs = np.linspace(bbox_min[2], bbox_max[2], voxel_resolution)
+    XX, YY, ZZ = np.meshgrid(xs, ys, zs, indexing="ij")
+    grid_pts = np.column_stack([XX.ravel(), YY.ravel(), ZZ.ravel()])
+
+    tree = cKDTree(pts)
+    dists1, _ = tree.query(grid_pts, k=1, workers=-1)
+
+    # Sign via a discrete winding-number approximation: for each voxel we query the
+    # k_sign nearest surface points and compute sum( n.(x-p) / |x-p|^3 ).
+    # The 1/d^3 falloff (same exponent as the true winding number) strongly down-weights
+    # contributions from distant surface elements, so the back face of a thin protrusion
+    # (e.g. an ear) cannot flip the sign of a voxel just outside the ear tip.
+    # Processed in chunks to keep peak memory reasonable.
+    chunk = 100_000
+    sign_score = np.empty(len(grid_pts), dtype=np.float64)
+    for start in range(0, len(grid_pts), chunk):
+        g = grid_pts[start : start + chunk]
+        d_k, idx_k = tree.query(g, k=k_sign, workers=-1)
+        diff_k = g[:, None, :] - pts[idx_k]                          # x - p
+        dot_k  = np.einsum("ijk,ijk->ij", diff_k, nrm[idx_k])        # n . (x-p)
+        sign_score[start : start + chunk] = np.sum(dot_k / (d_k ** 3 + 1e-12), axis=1)
+    signs = np.where(sign_score >= 0, 1.0, -1.0)
+
+    sdf_grid = (signs * dists1).reshape(
+        voxel_resolution, voxel_resolution, voxel_resolution
+    ).astype(np.float32)
+
+    sdf_smooth = scipy.ndimage.gaussian_filter(sdf_grid, sigma=smooth_sigma)
+
+    spacing = tuple((bbox_max - bbox_min) / (voxel_resolution - 1))
+    verts, faces, _, _ = marching_cubes(sdf_smooth, level=0.0, spacing=spacing)
+    verts_world = verts + bbox_min
+
+    mesh = o3d.geometry.TriangleMesh()
+    mesh.vertices = o3d.utility.Vector3dVector(verts_world.astype(np.float64))
+    mesh.triangles = o3d.utility.Vector3iVector(faces.astype(np.int32))
+    mesh.remove_degenerate_triangles()
+    mesh.remove_duplicated_triangles()
+    mesh.remove_duplicated_vertices()
+    mesh.remove_non_manifold_edges()
+    mesh.compute_vertex_normals()
+
+    if not o3d.io.write_triangle_mesh(str(out_path), mesh):
+        raise OSError(f"Could not write mesh: {out_path}")
+    return mesh
+
+
+def reconstruct_surface_neural(
+    points,
+    out_path,
+    voxel_resolution=128,
+    smooth_sigma=0.8,
+    iterations=2000,
+    camera_location=None,
+):
+    # Neural implicit surface (IGR-style): fits a small MLP to represent the SDF
+    # using a surface loss, normal consistency, and Eikonal regularisation.
+    # No pretrained weights needed -- the network fits directly to each point cloud.
+    # Runs on GPU if available; expect ~5-10 min on CPU.
+    try:
+        import torch
+        import torch.nn as nn
+        import torch.nn.functional as F
+    except (ImportError, OSError):
+        raise RuntimeError("PyTorch is required.")
+
+    pcd = clean_point_cloud(make_point_cloud(points))
+    estimate_normals(pcd, camera_location=camera_location)
+
+    pts = np.asarray(pcd.points, dtype=np.float64)
+    nrm = np.asarray(pcd.normals, dtype=np.float64)
+
+    # Normalise to [-1, 1] so the MLP sees a consistent input range.
+    center = pts.mean(axis=0)
+    scale = np.ptp(pts, axis=0).max() / 2.0
+    pts_n = (pts - center) / scale
+
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    print(f"  device: {device}")
+
+    class SDFNet(nn.Module):
+        def __init__(self):
+            super().__init__()
+            W = 256
+            self.net = nn.Sequential(
+                nn.Linear(3, W), nn.Softplus(beta=100),
+                nn.Linear(W, W), nn.Softplus(beta=100),
+                nn.Linear(W, W), nn.Softplus(beta=100),
+                nn.Linear(W, W), nn.Softplus(beta=100),
+                nn.Linear(W, W), nn.Softplus(beta=100),
+                nn.Linear(W, W), nn.Softplus(beta=100),
+                nn.Linear(W, 1),
+            )
+
+        def forward(self, x):
+            return self.net(x)
+
+    net = SDFNet().to(device)
+    optimizer = torch.optim.Adam(net.parameters(), lr=5e-4)
+    scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=800, gamma=0.5)
+
+    pts_t = torch.tensor(pts_n, dtype=torch.float32, device=device)
+    nrm_t = torch.tensor(nrm, dtype=torch.float32, device=device)
+    batch = min(5000, len(pts_n))
+
+    for step in range(iterations):
+        idx = torch.randperm(len(pts_t), device=device)[:batch]
+        x_surf = pts_t[idx].requires_grad_(True)
+        n_surf = nrm_t[idx]
+
+        pred = net(x_surf)
+        loss_s = pred.abs().mean()
+
+        grad = torch.autograd.grad(pred.sum(), x_surf, create_graph=True)[0]
+        loss_n = (1 - F.cosine_similarity(grad, n_surf)).abs().mean()
+
+        x_off = (torch.rand(batch, 3, device=device) * 2 - 1) * 1.5
+        x_off.requires_grad_(True)
+        pred_off = net(x_off)
+        grad_off = torch.autograd.grad(pred_off.sum(), x_off, create_graph=True)[0]
+        loss_e = (grad_off.norm(dim=1) - 1).pow(2).mean()
+
+        loss = loss_s + 0.1 * loss_n + 0.1 * loss_e
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+        scheduler.step()
+
+        if (step + 1) % 500 == 0:
+            print(f"  step {step + 1}/{iterations}  loss {loss.item():.4f}")
+
+    # Evaluate the network on a regular voxel grid, then run marching cubes.
+    lin = np.linspace(-1.2, 1.2, voxel_resolution)
+    XX, YY, ZZ = np.meshgrid(lin, lin, lin, indexing="ij")
+    grid_n = np.column_stack([XX.ravel(), YY.ravel(), ZZ.ravel()])
+
+    net.eval()
+    vals = []
+    with torch.no_grad():
+        for i in range(0, len(grid_n), 50000):
+            g = torch.tensor(grid_n[i:i + 50000], dtype=torch.float32, device=device)
+            vals.append(net(g).cpu().numpy())
+    sdf_grid = np.concatenate(vals).reshape(
+        voxel_resolution, voxel_resolution, voxel_resolution
+    ).astype(np.float32)
+
+    sdf_smooth = scipy.ndimage.gaussian_filter(sdf_grid, sigma=smooth_sigma)
+    spacing_val = 2.4 / (voxel_resolution - 1)
+    verts, faces, _, _ = marching_cubes(sdf_smooth, level=0.0, spacing=(spacing_val,) * 3)
+    # Map from [0, 2.4]^3 (marching cubes output) back to world space.
+    verts_world = (verts - 1.2) * scale + center
+
+    mesh = o3d.geometry.TriangleMesh()
+    mesh.vertices = o3d.utility.Vector3dVector(verts_world.astype(np.float64))
+    mesh.triangles = o3d.utility.Vector3iVector(faces.astype(np.int32))
+    mesh.remove_degenerate_triangles()
+    mesh.remove_duplicated_triangles()
+    mesh.remove_duplicated_vertices()
+    mesh.remove_non_manifold_edges()
+    mesh.compute_vertex_normals()
+
+    if not o3d.io.write_triangle_mesh(str(out_path), mesh):
         raise OSError(f"Could not write mesh: {out_path}")
     return mesh
 
