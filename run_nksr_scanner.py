@@ -99,19 +99,24 @@ def main():
     parser.add_argument("--normal-max-nn", type=int, default=40)
     args = parser.parse_args()
 
-    repo = Path(args.repo).resolve()
-    package_dir = repo / "package"
-    if package_dir.exists():
-        sys.path.insert(0, str(package_dir))
-
     try:
         import nksr
     except ImportError as exc:
-        raise ImportError(
-            "NKSR is cloned but not installed. The official package currently builds its native "
-            "extensions on x86-64 Linux with CUDA/NVCC. In a Linux/WSL CUDA environment, install it with: "
-            "pip install -r nksr/requirements.txt && pip install --no-build-isolation nksr/package"
-        ) from exc
+        repo = Path(args.repo).expanduser().resolve()
+        package_dir = repo / "package"
+        if package_dir.exists():
+            sys.path.insert(0, str(package_dir))
+            try:
+                import nksr
+            except ImportError as repo_exc:
+                raise ImportError(
+                    "NKSR is cloned but not installed/built. In WSL, build it with the helper "
+                    "script setup_nksr_wsl.sh, then rerun this command."
+                ) from repo_exc
+        else:
+            raise ImportError(
+                "NKSR is not installed and no repo package directory was found."
+            ) from exc
 
     device_name = args.device
     if device_name.startswith("cuda") and not torch.cuda.is_available():
