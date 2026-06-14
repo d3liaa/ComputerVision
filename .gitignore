@@ -3,3 +3,4 @@
 __pycache__
 .venv312
 .DS_Store
+.wsl_tools
