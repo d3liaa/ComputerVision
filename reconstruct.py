@@ -270,6 +270,50 @@ def reconstruct_surface(points, out_path, depth=9, density_quantile=0.04, camera
     return mesh
 
 
+def reconstruct_surface_ball_pivoting(
+    points,
+    out_path,
+    radius_factors=(1.5, 2.5, 4.0),
+    keep_largest_component=True,
+    camera_location=None,
+):
+    # Ball Pivoting is a local triangulation method for oriented point clouds.
+    # Radii are derived from the median nearest-neighbour distance so the same
+    # parameters transfer across datasets with different scales.
+    pcd = clean_point_cloud(make_point_cloud(points))
+    estimate_normals(pcd, camera_location=camera_location)
+
+    distances = np.asarray(pcd.compute_nearest_neighbor_distance(), dtype=np.float64)
+    distances = distances[np.isfinite(distances) & (distances > 0)]
+    if len(distances) == 0:
+        raise ValueError("Could not estimate point spacing for Ball Pivoting")
+
+    base_radius = float(np.median(distances))
+    radii = [base_radius * float(factor) for factor in radius_factors]
+    mesh = o3d.geometry.TriangleMesh.create_from_point_cloud_ball_pivoting(
+        pcd, o3d.utility.DoubleVector(radii)
+    )
+
+    bbox = pcd.get_axis_aligned_bounding_box().scale(1.03, pcd.get_center())
+    mesh = mesh.crop(bbox)
+    mesh.remove_degenerate_triangles()
+    mesh.remove_duplicated_triangles()
+    mesh.remove_duplicated_vertices()
+    mesh.remove_non_manifold_edges()
+
+    if keep_largest_component and len(mesh.triangles) > 0:
+        labels, counts, _ = mesh.cluster_connected_triangles()
+        labels = np.asarray(labels)
+        counts = np.asarray(counts)
+        mesh.remove_triangles_by_mask(labels != int(np.argmax(counts)))
+        mesh.remove_unreferenced_vertices()
+
+    mesh.compute_vertex_normals()
+    if not o3d.io.write_triangle_mesh(str(out_path), mesh):
+        raise OSError(f"Could not write mesh: {out_path}")
+    return mesh
+
+
 def reconstruct_surface_sdf(
     points,
     out_path,

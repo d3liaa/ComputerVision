@@ -1,3 +1,0 @@
-include_configs:
-  - param.yaml
-  - train.yaml

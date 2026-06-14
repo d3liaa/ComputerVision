@@ -1,0 +1,19 @@
+name: scanner-cv
+channels:
+  - conda-forge
+  - nodefaults
+dependencies:
+  - python=3.10
+  - pip
+  - ipykernel
+  - numpy
+  - scipy
+  - scikit-image
+  - matplotlib
+  - plotly
+  - open3d
+  - pip:
+      - --extra-index-url https://download.pytorch.org/whl/cu128
+      - torch==2.7.0+cu128
+      - torchvision==0.22.0+cu128
+      - opencv-contrib-python
