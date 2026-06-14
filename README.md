@@ -23,8 +23,5 @@
 - [x] Reconstruct mesh from point cloud
 - [x] Export original Blender object as ground-truth mesh
 - [x] Compute Chamfer Distance
+- [x] Instead of extracting camera params directly from blender, make a camera calibration step via a checkerboard rendering
 - [ ] Write final report/evaluation
-
-
-Future work:
-- [] Instead of extracting camera params directly from blender, make a camera calibration step via a checkerboard rendering

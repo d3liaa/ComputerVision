@@ -276,18 +276,23 @@ def reconstruct_surface_sdf(
     voxel_resolution=128,
     smooth_sigma=1.5,
     padding_factor=0.15,
-    k_sign=8,
+    k_sign=16,
+    sign_method="auto",
+    shell_dilation=None,
+    trim_distance="auto",
+    keep_largest_component=True,
     camera_location=None,
 ):
-    # Build a volumetric SDF on a regular voxel grid, smooth it with a Gaussian filter,
-    # then extract the zero iso-surface via marching cubes.
-    # Sign is computed via a discrete winding-number approximation (see below) which
-    # handles thin protrusions like ears correctly without any external C++ libraries.
+    # Volumetric SDF reconstruction followed by light surface cleanup.
     pcd = clean_point_cloud(make_point_cloud(points))
     estimate_normals(pcd, camera_location=camera_location)
 
     pts = np.asarray(pcd.points, dtype=np.float64)
     nrm = np.asarray(pcd.normals, dtype=np.float64)
+    center = np.median(pts, axis=0)
+    outward = np.einsum("ij,ij->i", nrm, pts - center)
+    if np.mean(outward) < 0:
+        nrm *= -1.0
 
     pad = padding_factor * np.ptp(pts, axis=0)
     bbox_min = pts.min(axis=0) - pad
@@ -301,22 +306,72 @@ def reconstruct_surface_sdf(
 
     tree = cKDTree(pts)
     dists1, _ = tree.query(grid_pts, k=1, workers=-1)
+    spacing = tuple((bbox_max - bbox_min) / (voxel_resolution - 1))
 
-    # Sign via a discrete winding-number approximation: for each voxel we query the
-    # k_sign nearest surface points and compute sum( n.(x-p) / |x-p|^3 ).
-    # The 1/d^3 falloff (same exponent as the true winding number) strongly down-weights
-    # contributions from distant surface elements, so the back face of a thin protrusion
-    # (e.g. an ear) cannot flip the sign of a voxel just outside the ear tip.
-    # Processed in chunks to keep peak memory reasonable.
-    chunk = 100_000
-    sign_score = np.empty(len(grid_pts), dtype=np.float64)
-    for start in range(0, len(grid_pts), chunk):
-        g = grid_pts[start : start + chunk]
-        d_k, idx_k = tree.query(g, k=k_sign, workers=-1)
-        diff_k = g[:, None, :] - pts[idx_k]                          # x - p
-        dot_k  = np.einsum("ijk,ijk->ij", diff_k, nrm[idx_k])        # n . (x-p)
-        sign_score[start : start + chunk] = np.sum(dot_k / (d_k ** 3 + 1e-12), axis=1)
-    signs = np.where(sign_score >= 0, 1.0, -1.0)
+    signs = None
+    if sign_method in ("auto", "voxel"):
+        point_idx = np.rint((pts - bbox_min) / np.asarray(spacing)).astype(np.int32)
+        point_idx = np.clip(point_idx, 0, voxel_resolution - 1)
+        shell = np.zeros((voxel_resolution, voxel_resolution, voxel_resolution), dtype=bool)
+        shell[point_idx[:, 0], point_idx[:, 1], point_idx[:, 2]] = True
+
+        if shell_dilation is None:
+            sample = pts
+            if len(sample) > 20000:
+                sample = sample[np.linspace(0, len(sample) - 1, 20000).astype(np.int64)]
+            nn_dist, _ = cKDTree(sample).query(sample, k=2, workers=-1)
+            median_nn = float(np.median(nn_dist[:, 1]))
+            min_spacing = max(float(np.min(spacing)), 1e-12)
+            dilation_iters = int(np.clip(np.ceil(1.5 * median_nn / min_spacing), 1, 4))
+        else:
+            dilation_iters = max(0, int(shell_dilation))
+
+        if dilation_iters > 0:
+            structure = scipy.ndimage.generate_binary_structure(3, 2)
+            shell = scipy.ndimage.binary_dilation(
+                shell, structure=structure, iterations=dilation_iters
+            )
+            shell = scipy.ndimage.binary_closing(
+                shell, structure=structure, iterations=max(1, dilation_iters // 2)
+            )
+        else:
+            structure = scipy.ndimage.generate_binary_structure(3, 2)
+
+        outside_seed = np.zeros_like(shell, dtype=bool)
+        outside_seed[0, :, :] = ~shell[0, :, :]
+        outside_seed[-1, :, :] = ~shell[-1, :, :]
+        outside_seed[:, 0, :] = ~shell[:, 0, :]
+        outside_seed[:, -1, :] = ~shell[:, -1, :]
+        outside_seed[:, :, 0] = ~shell[:, :, 0]
+        outside_seed[:, :, -1] = ~shell[:, :, -1]
+        outside = scipy.ndimage.binary_propagation(
+            outside_seed, structure=structure, mask=~shell
+        )
+        solid = ~outside
+        inside_count = int(np.count_nonzero(solid & ~shell))
+        if inside_count > max(100, voxel_resolution):
+            signs = np.where(solid.ravel(), -1.0, 1.0)
+        elif sign_method == "voxel":
+            raise ValueError(
+                "Could not infer a closed voxel shell for SDF signing. "
+                "Try a lower voxel_resolution or larger shell_dilation."
+            )
+
+    if signs is None:
+        chunk = 100_000
+        k_sign = max(1, int(k_sign))
+        sign_score = np.empty(len(grid_pts), dtype=np.float64)
+        for start in range(0, len(grid_pts), chunk):
+            g = grid_pts[start : start + chunk]
+            d_k, idx_k = tree.query(g, k=k_sign, workers=-1)
+            if k_sign == 1:
+                d_k = d_k[:, None]
+                idx_k = idx_k[:, None]
+            diff_k = g[:, None, :] - pts[idx_k]
+            dot_k = np.einsum("ijk,ijk->ij", diff_k, nrm[idx_k])
+            weights = 1.0 / (d_k ** 3 + 1e-12)
+            sign_score[start : start + chunk] = np.sum(dot_k * weights, axis=1)
+        signs = np.where(sign_score >= 0, 1.0, -1.0)
 
     sdf_grid = (signs * dists1).reshape(
         voxel_resolution, voxel_resolution, voxel_resolution
@@ -324,7 +379,12 @@ def reconstruct_surface_sdf(
 
     sdf_smooth = scipy.ndimage.gaussian_filter(sdf_grid, sigma=smooth_sigma)
 
-    spacing = tuple((bbox_max - bbox_min) / (voxel_resolution - 1))
+    if not (float(np.min(sdf_smooth)) <= 0.0 <= float(np.max(sdf_smooth))):
+        raise ValueError(
+            "SDF grid does not cross zero. Try sign_method='voxel', "
+            "a lower voxel_resolution, or a larger shell_dilation."
+        )
+
     verts, faces, _, _ = marching_cubes(sdf_smooth, level=0.0, spacing=spacing)
     verts_world = verts + bbox_min
 
@@ -335,6 +395,27 @@ def reconstruct_surface_sdf(
     mesh.remove_duplicated_triangles()
     mesh.remove_duplicated_vertices()
     mesh.remove_non_manifold_edges()
+
+    if trim_distance is not None:
+        if trim_distance == "auto":
+            bbox_diag = float(np.linalg.norm(np.ptp(pts, axis=0)))
+            max_distance = bbox_diag * 0.06
+        else:
+            max_distance = float(trim_distance)
+        vertex_dist, _ = tree.query(np.asarray(mesh.vertices), k=1, workers=-1)
+        mesh.remove_vertices_by_mask(vertex_dist > max_distance)
+        mesh.remove_degenerate_triangles()
+        mesh.remove_duplicated_triangles()
+        mesh.remove_duplicated_vertices()
+        mesh.remove_unreferenced_vertices()
+
+    if keep_largest_component and len(mesh.triangles) > 0:
+        labels, counts, _ = mesh.cluster_connected_triangles()
+        labels = np.asarray(labels)
+        counts = np.asarray(counts)
+        mesh.remove_triangles_by_mask(labels != int(np.argmax(counts)))
+        mesh.remove_unreferenced_vertices()
+
     mesh.compute_vertex_normals()
 
     if not o3d.io.write_triangle_mesh(str(out_path), mesh):
