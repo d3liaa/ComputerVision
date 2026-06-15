@@ -371,9 +371,11 @@ def reconstruct_surface_sdf(
     camera_location=None,
 ):
     # Volumetric SDF reconstruction followed by light surface cleanup.
+    # First, we clean the point cloud and estimate normals
     pcd = clean_point_cloud(make_point_cloud(points))
     estimate_normals(pcd, camera_location=camera_location)
 
+    # Try to make normals point outward from the center of the point cloud
     pts = np.asarray(pcd.points, dtype=np.float64)
     nrm = np.asarray(pcd.normals, dtype=np.float64)
     center = np.median(pts, axis=0)
@@ -381,27 +383,42 @@ def reconstruct_surface_sdf(
     if np.mean(outward) < 0:
         nrm *= -1.0
 
+    # Create a padded bounding box of sample positions
     pad = padding_factor * np.ptp(pts, axis=0)
     bbox_min = pts.min(axis=0) - pad
     bbox_max = pts.max(axis=0) + pad
 
+    # In particular, each grid point will receive an approximate signed distance value
     xs = np.linspace(bbox_min[0], bbox_max[0], voxel_resolution)
     ys = np.linspace(bbox_min[1], bbox_max[1], voxel_resolution)
     zs = np.linspace(bbox_min[2], bbox_max[2], voxel_resolution)
     XX, YY, ZZ = np.meshgrid(xs, ys, zs, indexing="ij")
     grid_pts = np.column_stack([XX.ravel(), YY.ravel(), ZZ.ravel()])
 
+    # KD-tree allows for fast NN queries
     tree = cKDTree(pts)
+
+    # Unsigned distance given by NN query
     dists1, _ = tree.query(grid_pts, k=1, workers=-1)
+
+    # Physical spacing between neighboring voxels
     spacing = tuple((bbox_max - bbox_min) / (voxel_resolution - 1))
 
+    # First signing method: voxel flood fill.
+    # This tries to build a closed shell from the point cloud, then flood-fills
+    # from the outside of the volume. Anything not reached is considered inside.
     signs = None
     if sign_method in ("auto", "voxel"):
+        # Convert points into voxel indices
         point_idx = np.rint((pts - bbox_min) / np.asarray(spacing)).astype(np.int32)
         point_idx = np.clip(point_idx, 0, voxel_resolution - 1)
+
+        # Mark voxels that contain point-cloud samples as surface shell voxels
         shell = np.zeros((voxel_resolution, voxel_resolution, voxel_resolution), dtype=bool)
         shell[point_idx[:, 0], point_idx[:, 1], point_idx[:, 2]] = True
 
+        # Automatically choose how much to dilate the shell.
+        # Dilation helps close small holes in the voxelized point cloud.
         if shell_dilation is None:
             sample = pts
             if len(sample) > 20000:
@@ -415,15 +432,21 @@ def reconstruct_surface_sdf(
 
         if dilation_iters > 0:
             structure = scipy.ndimage.generate_binary_structure(3, 2)
+
+            # Thicken the shell to make it more likely to be watertight
             shell = scipy.ndimage.binary_dilation(
                 shell, structure=structure, iterations=dilation_iters
             )
+
+            # Close tiny gaps in the shell
             shell = scipy.ndimage.binary_closing(
                 shell, structure=structure, iterations=max(1, dilation_iters // 2)
             )
         else:
             structure = scipy.ndimage.generate_binary_structure(3, 2)
 
+        # Start flood fill from the boundary of the volume.
+        # These boundary voxels are assumed to be outside the object.
         outside_seed = np.zeros_like(shell, dtype=bool)
         outside_seed[0, :, :] = ~shell[0, :, :]
         outside_seed[-1, :, :] = ~shell[-1, :, :]
@@ -431,11 +454,17 @@ def reconstruct_surface_sdf(
         outside_seed[:, -1, :] = ~shell[:, -1, :]
         outside_seed[:, :, 0] = ~shell[:, :, 0]
         outside_seed[:, :, -1] = ~shell[:, :, -1]
+
+        # Propagate through all non-shell voxels reachable from the boundary.
+        # Those voxels are outside.
         outside = scipy.ndimage.binary_propagation(
             outside_seed, structure=structure, mask=~shell
         )
+
+        # Voxels not reachable from the outside are treated as solid/inside.
         solid = ~outside
         inside_count = int(np.count_nonzero(solid & ~shell))
+        # If a meaningful inside region was found, assign negative sign inside.. and positive sign outside
         if inside_count > max(100, voxel_resolution):
             signs = np.where(solid.ravel(), -1.0, 1.0)
         elif sign_method == "voxel":
@@ -444,37 +473,58 @@ def reconstruct_surface_sdf(
                 "Try a lower voxel_resolution or larger shell_dilation."
             )
 
+    # Fallback signing method: use point normals.
+    # For each grid point, look at nearby surface points and their normals.
+    # If the grid point lies mostly in the normal direction, it is outside;
+    # otherwise it is inside.
     if signs is None:
         chunk = 100_000
         k_sign = max(1, int(k_sign))
         sign_score = np.empty(len(grid_pts), dtype=np.float64)
         for start in range(0, len(grid_pts), chunk):
             g = grid_pts[start : start + chunk]
+            # Find k nearest point-cloud points for each grid point
             d_k, idx_k = tree.query(g, k=k_sign, workers=-1)
             if k_sign == 1:
                 d_k = d_k[:, None]
                 idx_k = idx_k[:, None]
+            # Vector from nearby surface points to the grid point
             diff_k = g[:, None, :] - pts[idx_k]
+
+            # Dot product with normals estimates whether point is outside or inside
             dot_k = np.einsum("ijk,ijk->ij", diff_k, nrm[idx_k])
+
+            # Closer neighbors get much stronger influence
             weights = 1.0 / (d_k ** 3 + 1e-12)
             sign_score[start : start + chunk] = np.sum(dot_k * weights, axis=1)
         signs = np.where(sign_score >= 0, 1.0, -1.0)
 
+    # Combine sign and unsigned distance to produce a signed distance field.
+    # Negative values are inside, positive values are outside.
     sdf_grid = (signs * dists1).reshape(
         voxel_resolution, voxel_resolution, voxel_resolution
     ).astype(np.float32)
 
+    # Smooth the SDF to reduce noise and produce a cleaner surface.
     sdf_smooth = scipy.ndimage.gaussian_filter(sdf_grid, sigma=smooth_sigma)
 
+    # Marching cubes needs the SDF to cross zero.
+    # If all values are positive or all are negative, there is no surface to extract.
     if not (float(np.min(sdf_smooth)) <= 0.0 <= float(np.max(sdf_smooth))):
         raise ValueError(
             "SDF grid does not cross zero. Try sign_method='voxel', "
             "a lower voxel_resolution, or a larger shell_dilation."
         )
 
+    # Extract the zero level-set of the SDF as a triangle mesh.
+    # This is the actual surface reconstruction step.
     verts, faces, _, _ = marching_cubes(sdf_smooth, level=0.0, spacing=spacing)
+
+    # marching_cubes returns vertices relative to the grid origin.
+    # Shift them back into world coordinates.
     verts_world = verts + bbox_min
 
+    # And finally extract the mesh
     mesh = o3d.geometry.TriangleMesh()
     mesh.vertices = o3d.utility.Vector3dVector(verts_world.astype(np.float64))
     mesh.triangles = o3d.utility.Vector3iVector(faces.astype(np.int32))
@@ -483,6 +533,8 @@ def reconstruct_surface_sdf(
     mesh.remove_duplicated_vertices()
     mesh.remove_non_manifold_edges()
 
+    # Remove mesh vertices that are too far from the original point cloud.
+    # This trims floating artifacts produced by the volumetric reconstruction.
     if trim_distance is not None:
         if trim_distance == "auto":
             bbox_diag = float(np.linalg.norm(np.ptp(pts, axis=0)))
@@ -496,6 +548,8 @@ def reconstruct_surface_sdf(
         mesh.remove_duplicated_vertices()
         mesh.remove_unreferenced_vertices()
 
+    # Keep only the largest connected mesh component.
+    # This removes small disconnected fragments/noise.
     if keep_largest_component and len(mesh.triangles) > 0:
         labels, counts, _ = mesh.cluster_connected_triangles()
         labels = np.asarray(labels)
@@ -503,6 +557,7 @@ def reconstruct_surface_sdf(
         mesh.remove_triangles_by_mask(labels != int(np.argmax(counts)))
         mesh.remove_unreferenced_vertices()
 
+    # Compute smooth vertex normals for rendering/export.
     mesh.compute_vertex_normals()
 
     ensure_parent_dir(out_path)
@@ -522,7 +577,6 @@ def reconstruct_surface_neural(
     # Neural implicit surface (IGR-style): fits a small MLP to represent the SDF
     # using a surface loss, normal consistency, and Eikonal regularisation.
     # No pretrained weights needed -- the network fits directly to each point cloud.
-    # Runs on GPU if available; expect ~5-10 min on CPU.
     try:
         import torch
         import torch.nn as nn
@@ -530,9 +584,11 @@ def reconstruct_surface_neural(
     except (ImportError, OSError):
         raise RuntimeError("PyTorch is required.")
 
+    # Clean the point cloud and estimate normals before fitting the network
     pcd = clean_point_cloud(make_point_cloud(points))
     estimate_normals(pcd, camera_location=camera_location)
 
+    # Convert to numpy arrays
     pts = np.asarray(pcd.points, dtype=np.float64)
     nrm = np.asarray(pcd.normals, dtype=np.float64)
 
@@ -544,6 +600,7 @@ def reconstruct_surface_neural(
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"  device: {device}")
 
+    # Simple 6-layer MLP with width 256; Softplus activation (almost like ReLu given the high beta)
     class SDFNet(nn.Module):
         def __init__(self):
             super().__init__()
@@ -562,7 +619,9 @@ def reconstruct_surface_neural(
             return self.net(x)
 
     net = SDFNet().to(device)
+    # Adam optimizer, always a good choice..
     optimizer = torch.optim.Adam(net.parameters(), lr=5e-4)
+    # StepLR scheduler to reduce the learning rate progressively
     scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=800, gamma=0.5)
 
     pts_t = torch.tensor(pts_n, dtype=torch.float32, device=device)
@@ -580,6 +639,7 @@ def reconstruct_surface_neural(
         grad = torch.autograd.grad(pred.sum(), x_surf, create_graph=True)[0]
         loss_n = (1 - F.cosine_similarity(grad, n_surf)).abs().mean()
 
+        # Eikonal loss
         x_off = (torch.rand(batch, 3, device=device) * 2 - 1) * 1.5
         x_off.requires_grad_(True)
         pred_off = net(x_off)
@@ -610,12 +670,14 @@ def reconstruct_surface_neural(
         voxel_resolution, voxel_resolution, voxel_resolution
     ).astype(np.float32)
 
+    # A bit of smoothing to clean up noise before meshing
     sdf_smooth = scipy.ndimage.gaussian_filter(sdf_grid, sigma=smooth_sigma)
     spacing_val = 2.4 / (voxel_resolution - 1)
     verts, faces, _, _ = marching_cubes(sdf_smooth, level=0.0, spacing=(spacing_val,) * 3)
     # Map from [0, 2.4]^3 (marching cubes output) back to world space.
     verts_world = (verts - 1.2) * scale + center
 
+    # And finally, we create the mesh and save it
     mesh = o3d.geometry.TriangleMesh()
     mesh.vertices = o3d.utility.Vector3dVector(verts_world.astype(np.float64))
     mesh.triangles = o3d.utility.Vector3iVector(faces.astype(np.int32))
