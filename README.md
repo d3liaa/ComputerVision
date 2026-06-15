@@ -38,7 +38,7 @@ Skip the notebook dependency-install cells when using `environment.yml`.
 Command-line equivalents for the core steps:
 
 ```bash
-python calibrate_camera.py --update-config
+python calibrate_camera_to_disk.py --update-config
 python calibrate_laser.py --update-config
 python extract_stripes.py
 python reconstruct.py
@@ -52,7 +52,7 @@ Main generated files:
 
 - `output/stripe_masks_<dataset>/`: binary laser masks
 - `output/stripe_coords_<dataset>/`: extracted centerline coordinates
-- `output/camera_calibration_<dataset>.json`: camera calibration report
+- `output/camera_calibration_<dataset>.json`: camera-to-disk calibration report
 - `output/laser_calibration_<dataset>.json`: laser-plane calibration report
 - `output/point_cloud_<dataset>.ply`: reconstructed point cloud
 - `output/mesh_<dataset>.ply`: default reconstructed mesh
@@ -121,9 +121,9 @@ You can use `fx_px`, `fy_px`, `cx_px`, and `cy_px` instead of `focal_length_mm` 
 
 Do not provide these estimated or generated values for a new object:
 
-- `camera.world_to_camera_rotation` and `camera.world_to_camera_translation`: written by `python calibrate_camera.py --update-config`
+- `camera.world_to_camera_rotation` and `camera.world_to_camera_translation`: written by `python calibrate_camera_to_disk.py --update-config`
 - `laser.point` and `laser.normal`: written by `python calibrate_laser.py --update-config`
-- `disk.center` and `disk.axis`: written by camera calibration as the canonical turntable frame
+- `disk.center` and `disk.axis`: written by camera-to-disk calibration as the canonical turntable frame
 - output paths such as `stripe_masks_dir`, `stripe_coords_dir`, `point_cloud`, `reconstructed_mesh`, `reconstructed_mesh_obj`, and `metrics`: derived automatically from `output_dir` and the dataset name
 
 `ground_truth_mesh` is optional. If it is missing or points to a file that does not exist, reconstruction still runs and validation is skipped.
