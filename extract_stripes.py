@@ -4,7 +4,13 @@ import glob
 import json
 import os
 
-from reconstruct import apply_config_defaults
+from reconstruct import (
+    apply_config_defaults,
+    build_camera_matrix,
+    build_extrinsics,
+    disk_frame,
+    ray_plane_intersect,
+)
 
 
 def contiguous_runs(indices):
@@ -184,6 +190,94 @@ def choose_dominant_cluster(candidates, axis, image_shape, kmeans_cfg):
     return candidates[labels == best_label] if best_label is not None else candidates
 
 
+def filter_disk_geometry(candidates, config, filter_cfg):
+    # Use the calibrated camera, laser plane, and turntable plane to remove
+    # stripe candidates that reconstruct onto the disk itself.
+    if len(candidates) == 0 or not filter_cfg.get("enabled", True):
+        return candidates
+
+    if not filter_cfg.get("use_geometry", True):
+        return candidates
+
+    try:
+        cam = config["camera"]
+        laser = config["laser"]
+        disk = config["disk"]
+        K = build_camera_matrix(cam)
+        R_cam, t_cam = build_extrinsics(cam)
+        cam_origin = -R_cam.T @ t_cam
+        plane_normal = np.array(laser["normal"], dtype=np.float64)
+        plane_point = np.array(laser["point"], dtype=np.float64)
+        disk_center = np.array(disk["center"], dtype=np.float64)
+        disk_axis = np.array(disk.get("axis", [0.0, 0.0, 1.0]), dtype=np.float64)
+    except KeyError:
+        return candidates
+
+    disk_axis_norm = np.linalg.norm(disk_axis)
+    if disk_axis_norm <= 0:
+        return candidates
+    disk_axis = disk_axis / disk_axis_norm
+    basis = disk_frame(disk_axis, disk.get("reference_x", [1.0, 0.0, 0.0]))
+
+    min_radius = filter_cfg.get("min_radius")
+    max_radius = filter_cfg.get("max_radius")
+    min_abs_denom = float(filter_cfg.get("min_abs_plane_denom", 1e-8))
+
+    candidate_heights = []
+    candidate_in_radius = []
+    for candidate in candidates:
+        v, u = float(candidate[0]), float(candidate[1])
+        ray_cam = np.array(
+            [
+                (u - K[0, 2]) / K[0, 0],
+                (v - K[1, 2]) / K[1, 1],
+                1.0,
+            ],
+            dtype=np.float64,
+        )
+        ray_world = R_cam.T @ ray_cam
+        ray_world /= np.linalg.norm(ray_world)
+        point = ray_plane_intersect(cam_origin, ray_world, plane_normal, plane_point, min_abs_denom)
+        if point is None:
+            candidate_heights.append(np.nan)
+            candidate_in_radius.append(False)
+            continue
+
+        point_local = basis.T @ (point - disk_center)
+        height = float(point_local[2])
+        radius = float(np.linalg.norm(point_local[:2]))
+        in_radius = True
+        if min_radius is not None and radius < float(min_radius):
+            in_radius = False
+        if max_radius is not None and radius > float(max_radius):
+            in_radius = False
+
+        candidate_heights.append(height)
+        candidate_in_radius.append(in_radius)
+
+    heights = np.asarray(candidate_heights, dtype=np.float64)
+    in_radius = np.asarray(candidate_in_radius, dtype=bool)
+    finite = np.isfinite(heights)
+    if not np.any(finite & in_radius):
+        return candidates
+
+    valid_heights = heights[finite & in_radius]
+    negative_or_plane = valid_heights[valid_heights <= 0.0]
+    if len(negative_or_plane) >= 5:
+        noise_scale = float(np.percentile(np.abs(negative_or_plane), 95))
+    else:
+        near_plane = np.sort(np.abs(valid_heights))[: max(5, min(20, len(valid_heights)))]
+        noise_scale = float(np.median(near_plane) + 3.0 * np.std(near_plane))
+
+    height_extent = float(np.percentile(valid_heights, 95) - np.percentile(valid_heights, 5))
+    fallback_scale = max(height_extent * 0.01, 1e-4)
+    disk_band = max(noise_scale, fallback_scale)
+
+    keep = ~finite | ~in_radius | (heights > disk_band)
+
+    return candidates[np.asarray(keep, dtype=bool)]
+
+
 def collapse_to_centerline(candidates, axis):
     # Collapse the candidates to a single centerline (keeping the most likely one)
     if len(candidates) == 0:
@@ -202,15 +296,21 @@ def collapse_to_centerline(candidates, axis):
     return coords[order]
 
 
-def extract_stripe_coords(img, stripe_cfg):
+def extract_stripe_coords(img, config_or_stripe):
     # Main function that extracts the stripe coordinates from an image
+    if "stripe" in config_or_stripe:
+        config = config_or_stripe
+        stripe_cfg = config["stripe"]
+    else:
+        config = None
+        stripe_cfg = config_or_stripe
     min_red = stripe_cfg["min_red"] # Minimum red channel value to consider a pixel part of the laser stripe
     min_excess = stripe_cfg["min_red_excess"] # Minimum excess of red channel (compared to green/blue) to consider a pixel part of the laser stripe
     scan_axis = stripe_cfg.get("scan_axis", "auto") # Whether to scan by row or column (if auto, it will be decided based on the shape of the detected mask)
     window_radius = int(stripe_cfg.get("peak_window_radius", 4)) # When looking for a peak, we look in a window around the detected active pixel, this parameter controls the radius of that window (in pixels)
     min_peak_width = int(stripe_cfg.get("min_peak_width_px", 1)) # Minimum width of a peak to be considered a valid stripe point
-    max_row = stripe_cfg.get("max_row") # Maximum row to consider for stripe detection (useful to exclude the disk, as well as some noisy areas at the bottom of the image that can create strong reflections)
     kmeans_cfg = stripe_cfg.get("kmeans", {}) # Configuration for k-means clustering
+    turntable_filter_cfg = stripe_cfg.get("turntable_filter", {})
 
     b, g, r = cv2.split(img)
     b = b.astype(np.float32)
@@ -220,18 +320,25 @@ def extract_stripe_coords(img, stripe_cfg):
     red_excess = r - np.maximum(g, b)
     mask = (r > min_red) & (red_excess > min_excess)
 
-    if max_row is not None:
-        mask[int(max_row) + 1:, :] = False
-
     mask = mask.astype(np.uint8) * 255
 
     # Once the raw laser strip is found (contained in mask), we refine it via subpixel peak estimation (gaussian fitting), clustering to remove outliers and collapsing to a single centerline.
 
     axis = detect_scan_axis(mask, scan_axis)
     candidates = collect_peak_candidates(red_excess, mask, axis, window_radius, min_peak_width)
+    if config is not None:
+        candidates = filter_disk_geometry(candidates, config, turntable_filter_cfg)
     candidates = choose_dominant_cluster(candidates, axis, mask.shape, kmeans_cfg)
+
+    filtered_mask = np.zeros_like(mask)
+    if len(candidates) > 0:
+        rows = np.round(candidates[:, 0]).astype(np.int32)
+        cols = np.round(candidates[:, 1]).astype(np.int32)
+        valid = (0 <= rows) & (rows < mask.shape[0]) & (0 <= cols) & (cols < mask.shape[1])
+        filtered_mask[rows[valid], cols[valid]] = 255
+
     coords = collapse_to_centerline(candidates, axis)
-    return mask, coords, axis
+    return filtered_mask, coords, axis
 
 
 def main():
@@ -244,7 +351,6 @@ def main():
     masks_dir = config["paths"]["stripe_masks_dir"]
     coords_dir = config["paths"]["stripe_coords_dir"]
     input_glob = config["paths"].get("input_glob", "scan_*.png")
-    stripe_cfg = config["stripe"]
 
     print(f"Dataset: {root_config['active']}")
 
@@ -260,7 +366,7 @@ def main():
             print("Could not read:", path)
             continue
 
-        mask, coords, axis = extract_stripe_coords(img, stripe_cfg)
+        mask, coords, axis = extract_stripe_coords(img, config)
 
         stem = os.path.splitext(os.path.basename(path))[0]
         cv2.imwrite(os.path.join(masks_dir, stem + ".png"), mask)

@@ -42,14 +42,14 @@
     },
     "laser": {
       "point": [
-        0.04441647527158273,
-        0.08292015667168062,
-        0.8628456745138342
+        0.05654200877946567,
+        0.07272836563902468,
+        0.8016283574496119
       ],
       "normal": [
-        -0.8635979441035394,
-        -0.4968200190725385,
-        -0.08583973199458657
+        -0.8637161754882008,
+        -0.4965387156286699,
+        -0.08627671807542481
       ]
     },
     "stripe": {
@@ -58,7 +58,10 @@
       "scan_axis": "auto",
       "peak_window_radius": 4,
       "min_peak_width_px": 1,
-      "max_row": 600,
+      "turntable_filter": {
+        "enabled": true,
+        "use_geometry": true
+      },
       "kmeans": {
         "enabled": true,
         "clusters": 3,
@@ -68,13 +71,8 @@
     "reconstruction": {
       "min_abs_plane_denom": 1e-05,
       "max_radius": 1.7,
-      "min_z": 0.12,
-      "max_z": 3.2,
-      "radius_z_gate": {
-        "min_z": -1.0,
-        "max_z": 0.35,
-        "max_radius": 0.6
-      }
+      "min_z": -0.05,
+      "max_z": 3.2
     },
     "calibration": {
       "charuco": {
@@ -179,7 +177,10 @@
       "scan_axis": "auto",
       "peak_window_radius": 4,
       "min_peak_width_px": 1,
-      "max_row": 600,
+      "turntable_filter": {
+        "enabled": true,
+        "use_geometry": true
+      },
       "kmeans": {
         "enabled": true,
         "clusters": 3,

@@ -2,34 +2,34 @@
   "dataset": "suzanne",
   "camera_plane": {
     "normal": [
-      -0.9348679977941438,
-      0.2228514828220286,
-      -0.2763314012275699
+      -0.9349377833578209,
+      0.22312137259294645,
+      -0.27587713631652067
     ],
     "point": [
-      0.057730660852119725,
-      -0.3054184947314797,
-      6.535333026975753
+      0.0679048459306222,
+      -0.2448362364609858,
+      6.550324258309506
     ]
   },
   "world_plane": {
     "normal": [
-      -0.8635979441035394,
-      -0.4968200190725385,
-      -0.08583973199458657
+      -0.8637161754882008,
+      -0.4965387156286699,
+      -0.08627671807542481
     ],
     "point": [
-      0.04441647527158273,
-      0.08292015667168062,
-      0.8628456745138342
+      0.05654200877946567,
+      0.07272836563902468,
+      0.8016283574496119
     ]
   },
-  "total_points": 5110,
-  "kept_points": 5029,
+  "total_points": 5441,
+  "kept_points": 5353,
   "images": [
     {
       "image": "scanner_checkerboards_for_laser\\checkerboard_1.png",
-      "used_points": 194,
+      "used_points": 196,
       "charuco_corners": 70
     },
     {
@@ -39,22 +39,22 @@
     },
     {
       "image": "scanner_checkerboards_for_laser\\checkerboard_11.png",
-      "used_points": 122,
+      "used_points": 151,
       "charuco_corners": 69
     },
     {
       "image": "scanner_checkerboards_for_laser\\checkerboard_12.png",
-      "used_points": 150,
+      "used_points": 152,
       "charuco_corners": 70
     },
     {
       "image": "scanner_checkerboards_for_laser\\checkerboard_13.png",
-      "used_points": 148,
+      "used_points": 173,
       "charuco_corners": 70
     },
     {
       "image": "scanner_checkerboards_for_laser\\checkerboard_14.png",
-      "used_points": 149,
+      "used_points": 168,
       "charuco_corners": 70
     },
     {
@@ -64,12 +64,12 @@
     },
     {
       "image": "scanner_checkerboards_for_laser\\checkerboard_16.png",
-      "used_points": 227,
+      "used_points": 251,
       "charuco_corners": 70
     },
     {
       "image": "scanner_checkerboards_for_laser\\checkerboard_17.png",
-      "used_points": 107,
+      "used_points": 137,
       "charuco_corners": 65
     },
     {
@@ -84,7 +84,7 @@
     },
     {
       "image": "scanner_checkerboards_for_laser\\checkerboard_2.png",
-      "used_points": 203,
+      "used_points": 206,
       "charuco_corners": 70
     },
     {
@@ -94,7 +94,7 @@
     },
     {
       "image": "scanner_checkerboards_for_laser\\checkerboard_21.png",
-      "used_points": 108,
+      "used_points": 121,
       "charuco_corners": 70
     },
     {
@@ -104,7 +104,7 @@
     },
     {
       "image": "scanner_checkerboards_for_laser\\checkerboard_23.png",
-      "used_points": 109,
+      "used_points": 117,
       "charuco_corners": 70
     },
     {
@@ -114,17 +114,17 @@
     },
     {
       "image": "scanner_checkerboards_for_laser\\checkerboard_25.png",
-      "used_points": 181,
+      "used_points": 184,
       "charuco_corners": 70
     },
     {
       "image": "scanner_checkerboards_for_laser\\checkerboard_26.png",
-      "used_points": 202,
+      "used_points": 212,
       "charuco_corners": 69
     },
     {
       "image": "scanner_checkerboards_for_laser\\checkerboard_27.png",
-      "used_points": 199,
+      "used_points": 239,
       "charuco_corners": 70
     },
     {
@@ -134,22 +134,22 @@
     },
     {
       "image": "scanner_checkerboards_for_laser\\checkerboard_29.png",
-      "used_points": 100,
+      "used_points": 116,
       "charuco_corners": 70
     },
     {
       "image": "scanner_checkerboards_for_laser\\checkerboard_3.png",
-      "used_points": 143,
+      "used_points": 146,
       "charuco_corners": 68
     },
     {
       "image": "scanner_checkerboards_for_laser\\checkerboard_30.png",
-      "used_points": 157,
+      "used_points": 204,
       "charuco_corners": 70
     },
     {
       "image": "scanner_checkerboards_for_laser\\checkerboard_4.png",
-      "used_points": 129,
+      "used_points": 152,
       "charuco_corners": 70
     },
     {
@@ -164,12 +164,12 @@
     },
     {
       "image": "scanner_checkerboards_for_laser\\checkerboard_7.png",
-      "used_points": 131,
+      "used_points": 160,
       "charuco_corners": 70
     },
     {
       "image": "scanner_checkerboards_for_laser\\checkerboard_8.png",
-      "used_points": 238,
+      "used_points": 243,
       "charuco_corners": 70
     },
     {
