@@ -1,5 +1,6 @@
 {
   "active": "suzanne",
+  "output_dir": "output",
   "suzanne": {
     "camera": {
       "focal_length_mm": 35,
@@ -87,7 +88,8 @@
       "camera_board_dir": "scanner_checkerboard_for_camera",
       "laser_board_dir": "scanner_checkerboards_for_laser",
       "laser_board_glob": "*.png",
-      "laser_calibration_output": "laser_calibration_suzanne.json"
+      "camera_calibration_output": "output/camera_calibration_suzanne.json",
+      "laser_calibration_output": "output/laser_calibration_suzanne.json"
     },
     "disk": {
       "center": [
@@ -106,13 +108,13 @@
     "paths": {
       "input_dir": "scanner_suzanne",
       "input_glob": "suzanne*.png",
-      "stripe_masks_dir": "stripe_masks_suzanne",
-      "stripe_coords_dir": "stripe_coords_suzanne",
-      "point_cloud": "point_cloud_suzanne.ply",
-      "reconstructed_mesh": "mesh_suzanne.ply",
-      "reconstructed_mesh_obj": "blender/mesh_suzanne.obj",
+      "stripe_masks_dir": "output/stripe_masks_suzanne",
+      "stripe_coords_dir": "output/stripe_coords_suzanne",
+      "point_cloud": "output/point_cloud_suzanne.ply",
+      "reconstructed_mesh": "output/mesh_suzanne.ply",
+      "reconstructed_mesh_obj": "output/mesh_suzanne.obj",
       "ground_truth_mesh": "blender/suzanne.obj",
-      "metrics": "metrics_suzanne.json"
+      "metrics": "output/metrics_suzanne.json"
     }
   },
   "moon": {
@@ -202,7 +204,8 @@
       "camera_board_dir": "scanner_checkerboard_for_camera",
       "laser_board_dir": "scanner_checkerboards_for_laser",
       "laser_board_glob": "*.png",
-      "laser_calibration_output": "laser_calibration_moon.json"
+      "camera_calibration_output": "output/camera_calibration_moon.json",
+      "laser_calibration_output": "output/laser_calibration_moon.json"
     },
     "disk": {
       "center": [
@@ -221,13 +224,13 @@
     "paths": {
       "input_dir": "scanner_moon",
       "input_glob": "moon*.png",
-      "stripe_masks_dir": "stripe_masks_moon",
-      "stripe_coords_dir": "stripe_coords_moon",
-      "point_cloud": "point_cloud_moon.ply",
-      "reconstructed_mesh": "mesh_moon.ply",
-      "reconstructed_mesh_obj": "blender/mesh_moon.obj",
+      "stripe_masks_dir": "output/stripe_masks_moon",
+      "stripe_coords_dir": "output/stripe_coords_moon",
+      "point_cloud": "output/point_cloud_moon.ply",
+      "reconstructed_mesh": "output/mesh_moon.ply",
+      "reconstructed_mesh_obj": "output/mesh_moon.obj",
       "ground_truth_mesh": "blender/moondisplace7_ground_truth.stl",
-      "metrics": "metrics_moon.json"
+      "metrics": "output/metrics_moon.json"
     }
   }
 }

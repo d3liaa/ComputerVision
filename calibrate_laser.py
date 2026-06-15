@@ -7,7 +7,13 @@ import cv2
 import numpy as np
 
 from extract_stripes import extract_stripe_coords
-from reconstruct import build_camera_matrix, build_extrinsics
+from reconstruct import apply_config_defaults, build_camera_matrix, build_extrinsics
+
+
+def ensure_parent_dir(path):
+    parent = os.path.dirname(os.path.abspath(os.fspath(path)))
+    if parent:
+        os.makedirs(parent, exist_ok=True)
 
 
 def build_charuco_board(charuco_cfg):
@@ -246,17 +252,24 @@ def main():
 
     with open(args.config) as config_file:
         root_config = json.load(config_file)
+    root_config = apply_config_defaults(root_config)
 
     result = calibrate_laser(root_config)
-    active_config = root_config[root_config["active"]]
-    output_path = active_config["calibration"].get("laser_calibration_output", "laser_calibration.json")
+    dataset_name = root_config["active"]
+    active_config = root_config[dataset_name]
+    output_path = active_config["calibration"].get(
+        "laser_calibration_output",
+        os.path.join(root_config.get("output_dir", "output"), f"laser_calibration_{dataset_name}.json"),
+    )
 
+    ensure_parent_dir(output_path)
     with open(output_path, "w") as output_file:
         json.dump(result, output_file, indent=2)
 
     if args.update_config:
-        active_config["laser"]["normal"] = result["world_plane"]["normal"]
-        active_config["laser"]["point"] = result["world_plane"]["point"]
+        laser_cfg = active_config.setdefault("laser", {})
+        laser_cfg["normal"] = result["world_plane"]["normal"]
+        laser_cfg["point"] = result["world_plane"]["point"]
         with open(args.config, "w") as config_file:
             json.dump(root_config, config_file, indent=2)
 

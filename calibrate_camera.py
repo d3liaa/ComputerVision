@@ -7,7 +7,13 @@ import cv2
 import numpy as np
 
 from calibrate_laser import build_charuco_board
-from reconstruct import build_camera_matrix, build_extrinsics
+from reconstruct import apply_config_defaults, build_camera_matrix, build_extrinsics
+
+
+def ensure_parent_dir(path):
+    parent = os.path.dirname(os.path.abspath(os.fspath(path)))
+    if parent:
+        os.makedirs(parent, exist_ok=True)
 
 
 def select_image_paths(image_paths, max_frames):
@@ -299,7 +305,10 @@ def build_turntable_frame_camera(center_camera, axis_camera, translations):
 
 def config_camera_pose(camera_cfg):
     # Given camera exstrincs, report its location in world coordinates 
-    rotation_world_to_camera, translation_world_to_camera = build_extrinsics(camera_cfg)
+    try:
+        rotation_world_to_camera, translation_world_to_camera = build_extrinsics(camera_cfg)
+    except KeyError:
+        return None
     # p_c = R @ p_w + t => p_w = R.T @ (p_c - t) = R.T @ p_c - R.T @ t, so the camera location in world coordinates is -R.T @ t
     location = -rotation_world_to_camera.T @ translation_world_to_camera
     return {
@@ -314,6 +323,7 @@ def calibrate_camera(root_config, max_frames=90, min_corners=12):
     dataset_name = root_config["active"]
     config = root_config[dataset_name]
     calibration_cfg = config["calibration"]
+    disk_cfg = config.setdefault("disk", {})
 
     board = build_charuco_board(calibration_cfg["charuco"])
     image_paths = sorted(glob.glob(os.path.join(calibration_cfg["camera_board_dir"], "*.png")))
@@ -345,14 +355,17 @@ def calibrate_camera(root_config, max_frames=90, min_corners=12):
     fit_translations = translations
 
     # World-frame report (uses the ground-truth pose if present; for inspection only).
-    disk_center_world = camera_to_world_point(disk_center_cam, config["camera"])
-    disk_axis_world = camera_to_world_vector(disk_axis_cam, config["camera"])
-    disk_axis_world /= np.linalg.norm(disk_axis_world)
-
-    config_axis = np.array(config["disk"].get("axis", [0.0, 0.0, 1.0]), dtype=np.float64)
-    if disk_axis_world @ config_axis < 0:
-        disk_axis_world = -disk_axis_world
-        disk_axis_cam = -disk_axis_cam
+    config_axis = np.array(disk_cfg.get("axis", [0.0, 0.0, 1.0]), dtype=np.float64)
+    try:
+        disk_center_world = camera_to_world_point(disk_center_cam, config["camera"])
+        disk_axis_world = camera_to_world_vector(disk_axis_cam, config["camera"])
+        disk_axis_world /= np.linalg.norm(disk_axis_world)
+        if disk_axis_world @ config_axis < 0:
+            disk_axis_world = -disk_axis_world
+            disk_axis_cam = -disk_axis_cam
+    except KeyError:
+        disk_center_world = np.array([0.0, 0.0, 0.0], dtype=np.float64)
+        disk_axis_world = config_axis / np.linalg.norm(config_axis)
 
     reprojection_errors = np.concatenate([record["reprojection_errors"] for record in records])
     turntable_frame_camera = build_turntable_frame_camera(disk_center_cam, disk_axis_cam, fit_translations)
@@ -409,11 +422,17 @@ def main():
 
     with open(args.config) as f:
         root_config = json.load(f)
+    root_config = apply_config_defaults(root_config)
 
     result = calibrate_camera(root_config, max_frames=args.max_frames, min_corners=args.min_corners)
     dataset_name = root_config["active"]
-    output_path = args.output or f"camera_calibration_{dataset_name}.json"
+    calibration_cfg = root_config[dataset_name].get("calibration", {})
+    output_path = args.output or calibration_cfg.get(
+        "camera_calibration_output",
+        os.path.join(root_config.get("output_dir", "output"), f"camera_calibration_{dataset_name}.json"),
+    )
 
+    ensure_parent_dir(output_path)
     with open(output_path, "w") as f:
         json.dump(result, f, indent=2)
 
@@ -438,8 +457,9 @@ def main():
         config["camera"]["world_to_camera_translation"] = [
             round(v, 10) for v in extrinsics["world_to_camera_translation"]
         ]
-        config["disk"]["center"] = [0.0, 0.0, 0.0]
-        config["disk"]["axis"] = [0.0, 0.0, 1.0]
+        disk_cfg = config.setdefault("disk", {})
+        disk_cfg["center"] = [0.0, 0.0, 0.0]
+        disk_cfg["axis"] = [0.0, 0.0, 1.0]
         with open(args.config, "w") as f:
             json.dump(root_config, f, indent=2)
         print(f"Updated {args.config} with estimated camera extrinsics and canonical disk frame.")

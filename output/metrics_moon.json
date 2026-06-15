@@ -1,0 +1,12 @@
+{
+  "reconstruction_to_ground_truth_mean": 0.01289143712593293,
+  "ground_truth_to_reconstruction_mean": 0.023967344423443282,
+  "chamfer_l1_mean": 0.018429390774688106,
+  "chamfer_l2_mean": 0.0015571343531221268,
+  "reconstruction_to_ground_truth_p95": 0.024608607256239593,
+  "ground_truth_to_reconstruction_p95": 0.10128657686115676,
+  "dataset": "moon",
+  "sample_count": 30000,
+  "ground_truth_aligned_by_centroid_scale": true,
+  "ground_truth_aligned_by_scaling_icp": true
+}

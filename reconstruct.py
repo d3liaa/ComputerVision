@@ -8,6 +8,46 @@ from scipy.spatial import cKDTree
 from skimage.measure import marching_cubes
 
 
+def output_path(output_dir, name):
+    output_dir = str(output_dir).rstrip("/\\")
+    return f"{output_dir}/{name}" if output_dir else name
+
+
+def apply_config_defaults(root_config):
+    output_dir = root_config.get("output_dir", "output")
+    for dataset_name, config in root_config.items():
+        if dataset_name in ("active", "output_dir") or not isinstance(config, dict):
+            continue
+
+        calibration = config.setdefault("calibration", {})
+        calibration.setdefault(
+            "camera_calibration_output",
+            output_path(output_dir, f"camera_calibration_{dataset_name}.json"),
+        )
+        calibration.setdefault(
+            "laser_calibration_output",
+            output_path(output_dir, f"laser_calibration_{dataset_name}.json"),
+        )
+
+        config.setdefault("laser", {})
+
+        paths = config.setdefault("paths", {})
+        paths.setdefault("stripe_masks_dir", output_path(output_dir, f"stripe_masks_{dataset_name}"))
+        paths.setdefault("stripe_coords_dir", output_path(output_dir, f"stripe_coords_{dataset_name}"))
+        paths.setdefault("point_cloud", output_path(output_dir, f"point_cloud_{dataset_name}.ply"))
+        paths.setdefault("reconstructed_mesh", output_path(output_dir, f"mesh_{dataset_name}.ply"))
+        paths.setdefault("reconstructed_mesh_obj", output_path(output_dir, f"mesh_{dataset_name}.obj"))
+        paths.setdefault("metrics", output_path(output_dir, f"metrics_{dataset_name}.json"))
+
+    return root_config
+
+
+def ensure_parent_dir(path):
+    parent = os.path.dirname(os.path.abspath(os.fspath(path)))
+    if parent:
+        os.makedirs(parent, exist_ok=True)
+
+
 def build_camera_matrix(cam):
     # Camera intrinsics are assumed to be given, so we just set up a camera matrix K
     fx = cam.get("fx_px", cam["focal_length_mm"] * cam["image_width"] / cam["sensor_width_mm"])
@@ -199,6 +239,7 @@ def reconstruct(config):
 
 def save_ply(points, path):
     # Save the reconstructed points as a PLY file (ASCII format)
+    ensure_parent_dir(path)
     with open(path, "w") as f:
         f.write("ply\nformat ascii 1.0\n")
         f.write(f"element vertex {len(points)}\n")
@@ -265,6 +306,7 @@ def reconstruct_surface(points, out_path, depth=9, density_quantile=0.04, camera
     mesh.remove_non_manifold_edges()
     mesh.compute_vertex_normals()
 
+    ensure_parent_dir(out_path)
     if not o3d.io.write_triangle_mesh(out_path, mesh):
         raise OSError(f"Could not write mesh: {out_path}")
     return mesh
@@ -309,6 +351,7 @@ def reconstruct_surface_ball_pivoting(
         mesh.remove_unreferenced_vertices()
 
     mesh.compute_vertex_normals()
+    ensure_parent_dir(out_path)
     if not o3d.io.write_triangle_mesh(str(out_path), mesh):
         raise OSError(f"Could not write mesh: {out_path}")
     return mesh
@@ -462,6 +505,7 @@ def reconstruct_surface_sdf(
 
     mesh.compute_vertex_normals()
 
+    ensure_parent_dir(out_path)
     if not o3d.io.write_triangle_mesh(str(out_path), mesh):
         raise OSError(f"Could not write mesh: {out_path}")
     return mesh
@@ -581,6 +625,7 @@ def reconstruct_surface_neural(
     mesh.remove_non_manifold_edges()
     mesh.compute_vertex_normals()
 
+    ensure_parent_dir(out_path)
     if not o3d.io.write_triangle_mesh(str(out_path), mesh):
         raise OSError(f"Could not write mesh: {out_path}")
     return mesh
@@ -588,7 +633,7 @@ def reconstruct_surface_neural(
 
 def export_mesh(mesh, path):
     # Export mesh to viewable obj format
-    os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
+    ensure_parent_dir(path)
     mesh.compute_vertex_normals()
     if not o3d.io.write_triangle_mesh(path, mesh, write_vertex_normals=True):
         raise OSError(f"Could not write mesh: {path}")
@@ -685,6 +730,7 @@ def validate_reconstruction(config, dataset_name, sample_count=30000):
         "ground_truth_aligned_by_scaling_icp": True,
     })
 
+    ensure_parent_dir(paths["metrics"])
     with open(paths["metrics"], "w") as f:
         json.dump(metrics, f, indent=2)
     return metrics
@@ -693,6 +739,7 @@ def validate_reconstruction(config, dataset_name, sample_count=30000):
 if __name__ == "__main__":
     with open("config.json") as f:
         _cfg = json.load(f)
+    _cfg = apply_config_defaults(_cfg)
 
     config = _cfg[_cfg["active"]]
     print(f"Dataset: {_cfg['active']}")
@@ -715,8 +762,8 @@ if __name__ == "__main__":
         export_mesh(mesh, blender_mesh_path)
         print(f"Saved Blender mesh: {blender_mesh_path}")
 
-    ground_truth_path = config["paths"]["ground_truth_mesh"]
-    if os.path.exists(ground_truth_path):
+    ground_truth_path = config["paths"].get("ground_truth_mesh")
+    if ground_truth_path and os.path.exists(ground_truth_path):
         print("Computing Chamfer distance...")
         metrics = validate_reconstruction(config, _cfg["active"])
         print(f"Chamfer L1 mean: {metrics['chamfer_l1_mean']:.6f}")

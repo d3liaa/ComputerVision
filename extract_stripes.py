@@ -4,6 +4,8 @@ import glob
 import json
 import os
 
+from reconstruct import apply_config_defaults
+
 
 def contiguous_runs(indices):
     # Split a list of indices into contiguous runs (with a gap of 1)
@@ -235,6 +237,7 @@ def extract_stripe_coords(img, stripe_cfg):
 def main():
     with open("config.json") as f:
         root_config = json.load(f)
+    root_config = apply_config_defaults(root_config)
 
     config = root_config[root_config["active"]]
     input_dir = config["paths"]["input_dir"]
