@@ -1,5 +1,7 @@
 # Geometric 3D Scanner
 
+**Authors**: Luca Boscarato [20154] & Delia Mennitti [19610]
+
 Pipeline for reconstructing a mesh from synthetic laser-stripe scans of a rotating object. The project includes camera/laser calibration, stripe extraction, point-cloud reconstruction, surface reconstruction, and Chamfer-distance evaluation against a ground-truth mesh.
 
 ## Environment
