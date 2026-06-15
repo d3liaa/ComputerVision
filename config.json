@@ -70,9 +70,13 @@
     },
     "reconstruction": {
       "min_abs_plane_denom": 1e-05,
-      "max_radius": 1.7,
-      "min_z": -0.05,
-      "max_z": 3.2
+      "auto_bounds": {
+        "enabled": true,
+        "radius_percentile": 99.0,
+        "z_min_percentile": 1.0,
+        "z_max_percentile": 99.0,
+        "padding_fraction": 0.02
+      }
     },
     "calibration": {
       "charuco": {
@@ -189,9 +193,13 @@
     },
     "reconstruction": {
       "min_abs_plane_denom": 1e-05,
-      "max_radius": 1.3,
-      "min_z": -0.3,
-      "max_z": 1.9
+      "auto_bounds": {
+        "enabled": true,
+        "radius_percentile": 99.0,
+        "z_min_percentile": 1.0,
+        "z_max_percentile": 99.0,
+        "padding_fraction": 0.02
+      }
     },
     "calibration": {
       "charuco": {

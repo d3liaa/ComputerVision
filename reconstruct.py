@@ -30,6 +30,17 @@ def apply_config_defaults(root_config):
         )
 
         config.setdefault("laser", {})
+        reconstruction = config.setdefault("reconstruction", {})
+        reconstruction.setdefault(
+            "auto_bounds",
+            {
+                "enabled": True,
+                "radius_percentile": 99.0,
+                "z_min_percentile": 1.0,
+                "z_max_percentile": 99.0,
+                "padding_fraction": 0.02,
+            },
+        )
 
         paths = config.setdefault("paths", {})
         paths.setdefault("stripe_masks_dir", output_path(output_dir, f"stripe_masks_{dataset_name}"))
@@ -158,6 +169,78 @@ def ray_plane_intersect(origin, direction, plane_normal, plane_point, min_abs_de
     return origin + t * direction
 
 
+def estimate_reconstruction_bounds(points, recon_cfg):
+    auto_cfg = recon_cfg.get("auto_bounds", False)
+    if isinstance(auto_cfg, bool):
+        auto_cfg = {"enabled": auto_cfg}
+    if not auto_cfg.get("enabled", False) or len(points) == 0:
+        return (
+            recon_cfg.get("max_radius"),
+            recon_cfg.get("min_z"),
+            recon_cfg.get("max_z"),
+        )
+
+    points = np.asarray(points, dtype=np.float64)
+    finite = np.isfinite(points).all(axis=1)
+    points = points[finite]
+    min_points = int(auto_cfg.get("min_points", 50))
+    if len(points) < min_points:
+        return (
+            recon_cfg.get("max_radius"),
+            recon_cfg.get("min_z"),
+            recon_cfg.get("max_z"),
+        )
+
+    radii = np.linalg.norm(points[:, :2], axis=1)
+    heights = points[:, 2]
+    radius_percentile = float(auto_cfg.get("radius_percentile", 99.0))
+    z_min_percentile = float(auto_cfg.get("z_min_percentile", 1.0))
+    z_max_percentile = float(auto_cfg.get("z_max_percentile", 99.0))
+    padding_fraction = float(auto_cfg.get("padding_fraction", 0.02))
+
+    max_radius = recon_cfg.get("max_radius")
+    min_z = recon_cfg.get("min_z")
+    max_z = recon_cfg.get("max_z")
+
+    if max_radius is None:
+        max_radius = float(np.percentile(radii, radius_percentile) * (1.0 + padding_fraction))
+
+    z_low = float(np.percentile(heights, z_min_percentile))
+    z_high = float(np.percentile(heights, z_max_percentile))
+    z_padding = max((z_high - z_low) * padding_fraction, 1e-6)
+    if min_z is None:
+        min_z = z_low - z_padding
+    if max_z is None:
+        max_z = z_high + z_padding
+
+    return max_radius, min_z, max_z
+
+
+def filter_reconstruction_points(points, max_radius, min_z, max_z, radius_z_gate):
+    if len(points) == 0:
+        return points
+
+    points = np.asarray(points, dtype=np.float64)
+    keep = np.isfinite(points).all(axis=1)
+    radii = np.linalg.norm(points[:, :2], axis=1)
+    heights = points[:, 2]
+
+    if max_radius is not None:
+        keep &= radii <= float(max_radius)
+    if min_z is not None:
+        keep &= heights >= float(min_z)
+    if max_z is not None:
+        keep &= heights <= float(max_z)
+    if radius_z_gate is not None:
+        min_gate_z = float(radius_z_gate.get("min_z", -np.inf))
+        max_gate_z = float(radius_z_gate.get("max_z", np.inf))
+        max_gate_radius = float(radius_z_gate.get("max_radius", np.inf))
+        in_gate_z = (heights >= min_gate_z) & (heights <= max_gate_z)
+        keep &= ~(in_gate_z & (radii > max_gate_radius))
+
+    return points[keep]
+
+
 def reconstruct(config):
     # Main function that performs the 3D reconstruction from the detected stripe coordinates and the estimated configuration
     cam   = config["camera"]
@@ -177,9 +260,6 @@ def reconstruct(config):
     rotation_direction = float(disk.get("rotation_direction", -1.0))
     recon_cfg = config.get("reconstruction", {})
     min_abs_denom = float(recon_cfg.get("min_abs_plane_denom", 1e-8))
-    max_radius = recon_cfg.get("max_radius")
-    min_z = recon_cfg.get("min_z")
-    max_z = recon_cfg.get("max_z")
     radius_z_gate = recon_cfg.get("radius_z_gate")
 
     input_glob = config["paths"].get("input_glob", "*.png")
@@ -218,23 +298,13 @@ def reconstruct(config):
             # Undo disk rotation to bring point into object-local space
             point_local_world = R_disk_inv @ (point - disk_center)
             point_local = disk_basis.T @ point_local_world
-            if max_radius is not None and np.linalg.norm(point_local[:2]) > float(max_radius):
-                continue
-            if min_z is not None and point_local[2] < float(min_z):
-                continue
-            if max_z is not None and point_local[2] > float(max_z):
-                continue
-            if radius_z_gate is not None:
-                radial_distance = float(np.linalg.norm(point_local[:2]))
-                z_value = float(point_local[2])
-                min_gate_z = float(radius_z_gate.get("min_z", -np.inf))
-                max_gate_z = float(radius_z_gate.get("max_z", np.inf))
-                max_gate_radius = float(radius_z_gate.get("max_radius", np.inf))
-                if min_gate_z <= z_value <= max_gate_z and radial_distance > max_gate_radius:
-                    continue
             all_points.append(point_local)
 
-    return np.array(all_points, dtype=np.float32)
+    points = np.array(all_points, dtype=np.float64).reshape(-1, 3)
+    max_radius, min_z, max_z = estimate_reconstruction_bounds(points, recon_cfg)
+    points = filter_reconstruction_points(points, max_radius, min_z, max_z, radius_z_gate)
+    return points.astype(np.float32)
+
 
 
 def save_ply(points, path):
