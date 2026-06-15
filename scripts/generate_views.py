@@ -10,6 +10,7 @@ if str(REPO_ROOT) not in sys.path:
 import matplotlib.pyplot as plt
 import numpy as np
 import open3d as o3d
+from matplotlib.collections import PolyCollection
 
 from reconstruct import apply_config_defaults
 
@@ -52,16 +53,27 @@ def parse_args():
         help="Directory for PNGs. Defaults to <output_dir>/mesh_views_<dataset>.",
     )
     parser.add_argument(
-        "--points",
+        "--max-faces",
         type=int,
-        default=60000,
-        help="Number of mesh surface samples used for each render.",
+        default=200000,
+        help="Simplify meshes above this triangle count before rendering. Use 0 to disable.",
     )
     parser.add_argument(
         "--dpi",
         type=int,
         default=220,
         help="Output image DPI.",
+    )
+    parser.add_argument(
+        "--color-by",
+        choices=["height", "view-depth", "normal"],
+        default="height",
+        help="How to color mesh faces.",
+    )
+    parser.add_argument(
+        "--cmap",
+        default="turbo",
+        help="Matplotlib colormap used for height/view-depth coloring.",
     )
     parser.add_argument(
         "--separate-views",
@@ -77,16 +89,23 @@ def method_mesh_path(paths, method):
     return base.with_name(base.stem + suffix + base.suffix)
 
 
-def sample_mesh_points(mesh_path, count):
+def load_mesh_arrays(mesh_path, max_faces):
     mesh = o3d.io.read_triangle_mesh(str(mesh_path))
     if mesh.is_empty():
         raise ValueError(f"Could not read a mesh from {mesh_path}")
     if not mesh.has_triangles():
         raise ValueError(f"Mesh has no triangles: {mesh_path}")
 
+    if max_faces > 0 and len(mesh.triangles) > max_faces:
+        mesh = mesh.simplify_quadric_decimation(target_number_of_triangles=max_faces)
+
     mesh.compute_vertex_normals()
-    sampled = mesh.sample_points_uniformly(number_of_points=count)
-    return np.asarray(sampled.points, dtype=np.float64)
+    mesh.compute_triangle_normals()
+    return (
+        np.asarray(mesh.vertices, dtype=np.float64),
+        np.asarray(mesh.triangles, dtype=np.int64),
+        np.asarray(mesh.triangle_normals, dtype=np.float64),
+    )
 
 
 def equal_limits(values, pad=0.04):
@@ -101,10 +120,10 @@ def equal_limits(values, pad=0.04):
     return (lo - margin, hi + margin)
 
 
-def view_specs(points):
-    x_limits = equal_limits(points[:, 0])
-    y_limits = equal_limits(points[:, 1])
-    z_limits = equal_limits(points[:, 2])
+def view_specs(vertices):
+    x_limits = equal_limits(vertices[:, 0])
+    y_limits = equal_limits(vertices[:, 1])
+    z_limits = equal_limits(vertices[:, 2])
     xy_span = max(x_limits[1] - x_limits[0], y_limits[1] - y_limits[0])
     xy_center = (
         (x_limits[0] + x_limits[1]) * 0.5,
@@ -116,14 +135,97 @@ def view_specs(points):
     )
     bottom_y_limits = (-xy_limits[1][1], -xy_limits[1][0])
     return [
-        ("front", points[:, 0], points[:, 2], "x", "z", x_limits, z_limits),
-        ("top", points[:, 0], points[:, 1], "x", "y", xy_limits[0], xy_limits[1]),
-        ("bottom", points[:, 0], -points[:, 1], "x", "-y", xy_limits[0], bottom_y_limits),
+        ("front", "x", "z", x_limits, z_limits),
+        ("top", "x", "y", xy_limits[0], xy_limits[1]),
+        ("bottom", "x", "-y", xy_limits[0], bottom_y_limits),
     ]
 
 
-def draw_view(ax, title, x_values, y_values, color_values, x_label, y_label, x_lim, y_lim):
-    ax.scatter(x_values, y_values, c=color_values, s=0.18, cmap="viridis", linewidths=0)
+def project_vertices(vertices, view_name):
+    if view_name == "front":
+        return vertices[:, 0], vertices[:, 2], vertices[:, 1]
+    if view_name == "top":
+        return vertices[:, 0], vertices[:, 1], vertices[:, 2]
+    if view_name == "bottom":
+        return vertices[:, 0], -vertices[:, 1], -vertices[:, 2]
+    raise ValueError(f"Unknown view: {view_name}")
+
+
+def view_light_direction(view_name):
+    if view_name == "front":
+        return np.array([0.2, -0.7, 0.7], dtype=np.float64)
+    if view_name == "top":
+        return np.array([0.2, 0.2, 1.0], dtype=np.float64)
+    if view_name == "bottom":
+        return np.array([0.2, -0.2, -1.0], dtype=np.float64)
+    raise ValueError(f"Unknown view: {view_name}")
+
+
+def normalized(values):
+    lo, hi = np.percentile(values, [2.0, 98.0])
+    if hi <= lo:
+        lo = float(np.min(values))
+        hi = float(np.max(values))
+    if hi <= lo:
+        return np.full_like(values, 0.5, dtype=np.float64)
+    return np.clip((values - lo) / (hi - lo), 0.0, 1.0)
+
+
+def get_cmap(name):
+    try:
+        return plt.get_cmap(name)
+    except ValueError:
+        return plt.get_cmap("viridis")
+
+
+def face_colors(vertices, triangles, normals, depths, view_name, color_by, cmap_name):
+    light = view_light_direction(view_name)
+    light /= np.linalg.norm(light)
+    diffuse = np.clip(normals @ light, 0.0, 1.0)
+    shade = 0.55 + 0.45 * diffuse
+
+    if color_by == "normal":
+        colors = np.abs(normals)
+    else:
+        if color_by == "view-depth":
+            scalars = depths
+        else:
+            scalars = np.mean(vertices[:, 2][triangles], axis=1)
+        colors = get_cmap(cmap_name)(normalized(scalars))[:, :3]
+
+    colors *= shade[:, None]
+    return np.clip(colors, 0.0, 1.0)
+
+
+def draw_view(
+    ax,
+    title,
+    vertices,
+    triangles,
+    normals,
+    view_name,
+    x_label,
+    y_label,
+    x_lim,
+    y_lim,
+    color_by,
+    cmap_name,
+):
+    x_values, y_values, depths = project_vertices(vertices, view_name)
+    face_depths = np.mean(depths[triangles], axis=1)
+    order = np.argsort(face_depths)
+    polygons = np.stack((x_values[triangles], y_values[triangles]), axis=-1)[order]
+    colors = face_colors(vertices, triangles, normals, face_depths, view_name, color_by, cmap_name)[order]
+
+    collection = PolyCollection(
+        polygons,
+        facecolors=colors,
+        edgecolors=(0.02, 0.02, 0.02, 0.08),
+        linewidths=0.05,
+        closed=True,
+    )
+    ax.add_collection(collection)
+    ax.set_facecolor("#f5f5f2")
     ax.set_title(title)
     ax.set_xlabel(x_label)
     ax.set_ylabel(y_label)
@@ -133,41 +235,65 @@ def draw_view(ax, title, x_values, y_values, color_values, x_label, y_label, x_l
     ax.grid(False)
 
 
-def save_method_panel(points, method_label, output_path, dpi):
-    specs = view_specs(points)
+def save_method_panel(
+    vertices,
+    triangles,
+    normals,
+    method_label,
+    output_path,
+    dpi,
+    color_by,
+    cmap_name,
+):
+    specs = view_specs(vertices)
     fig, axes = plt.subplots(1, 3, figsize=(10.5, 3.6), constrained_layout=True)
-    color_values = points[:, 2]
-    for ax, (view_name, x_values, y_values, x_label, y_label, x_lim, y_lim) in zip(axes, specs):
+    for ax, (view_name, x_label, y_label, x_lim, y_lim) in zip(axes, specs):
         draw_view(
             ax,
             f"{method_label}: {view_name}",
-            x_values,
-            y_values,
-            color_values,
+            vertices,
+            triangles,
+            normals,
+            view_name,
             x_label,
             y_label,
             x_lim,
             y_lim,
+            color_by,
+            cmap_name,
         )
     fig.savefig(output_path, dpi=dpi, bbox_inches="tight")
     plt.close(fig)
 
 
-def save_separate_views(points, method_label, output_dir, dataset_name, method, dpi):
-    specs = view_specs(points)
-    color_values = points[:, 2]
-    for view_name, x_values, y_values, x_label, y_label, x_lim, y_lim in specs:
+def save_separate_views(
+    vertices,
+    triangles,
+    normals,
+    method_label,
+    output_dir,
+    dataset_name,
+    method,
+    dpi,
+    color_by,
+    cmap_name,
+):
+    specs = view_specs(vertices)
+    for view_name, x_label, y_label, x_lim, y_lim in specs:
         fig, ax = plt.subplots(figsize=(4.2, 4.2), constrained_layout=True)
         draw_view(
             ax,
             f"{method_label}: {view_name}",
-            x_values,
-            y_values,
-            color_values,
+            vertices,
+            triangles,
+            normals,
+            view_name,
             x_label,
             y_label,
             x_lim,
             y_lim,
+            color_by,
+            cmap_name,
         )
         out_path = output_dir / f"{dataset_name}_{method}_{view_name}.png"
         fig.savefig(out_path, dpi=dpi, bbox_inches="tight")
@@ -190,14 +316,34 @@ def render_dataset(root_config, dataset_name, args):
             print(f"{method}: missing mesh, skipping: {mesh_path}")
             continue
 
-        points = sample_mesh_points(mesh_path, args.points)
+        vertices, triangles, normals = load_mesh_arrays(mesh_path, args.max_faces)
         label = METHOD_LABELS[method]
         out_path = output_dir / f"{dataset_name}_{method}_front_top_bottom.png"
-        save_method_panel(points, label, out_path, args.dpi)
+        save_method_panel(
+            vertices,
+            triangles,
+            normals,
+            label,
+            out_path,
+            args.dpi,
+            args.color_by,
+            args.cmap,
+        )
         print(f"saved: {out_path}")
 
         if args.separate_views:
-            save_separate_views(points, label, output_dir, dataset_name, method, args.dpi)
+            save_separate_views(
+                vertices,
+                triangles,
+                normals,
+                label,
+                output_dir,
+                dataset_name,
+                method,
+                args.dpi,
+                args.color_by,
+                args.cmap,
+            )
 
 
 def main():
